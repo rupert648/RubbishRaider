@@ -17,10 +17,13 @@ public class RubbishRaider extends PApplet {
     final static int EMPTY = 0;
     final static int WALL = 1;
     // and how big are they?
-    final static int V_GRANULE_SIZE = MY_HEIGHT / V_GRANULES;
-    final static int H_GRANULE_SIZE = MY_WIDTH / H_GRANULES;
+    final static int V_GRANULE_SIZE = 10;
+    final static int H_GRANULE_SIZE = 10;
     // the current level
     public Level currentLevel = new Level(this);
+    // the camera
+    public Camera camera = new Camera();
+
     GameState gm = GameState.GENERATING;
     Properties config = new Properties();
     String configFilePath = "./src/configuration/RubbishRaider.config";
@@ -74,7 +77,7 @@ public class RubbishRaider extends PApplet {
     private void playGame() {
         background(128);
 
-        currentLevel.render();
+        camera.render(currentLevel);
     }
 
     private void lost() {
@@ -89,5 +92,20 @@ public class RubbishRaider extends PApplet {
         currentLevel.generateLevel();
 
         gm = GameState.PLAYING;
+    }
+
+    public void keyPressed() {
+        if (key == 'a') {
+            camera.position.x -= 5;
+        }
+        if (key == 'd') {
+            camera.position.x += 5;
+        }
+        if (key == 'w') {
+            camera.position.y -= 5;
+        }
+        if (key == 's') {
+            camera.position.y += 5;
+        }
     }
 }

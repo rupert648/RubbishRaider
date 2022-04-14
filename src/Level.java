@@ -271,7 +271,7 @@ public class Level {
         }
     }
 
-    public void render() {
+    public void render(PVector cameraPosition) {
         app.fill(0);
         for (int row = 0; row < RubbishRaider.V_GRANULES; row++) {
             for (int col = 0; col < RubbishRaider.H_GRANULES; col++) {
@@ -289,7 +289,11 @@ public class Level {
                         app.stroke(255, 140, 0);
                         app.fill(255, 140, 0);
                     }
-                    app.rect(col * RubbishRaider.H_GRANULE_SIZE, row * RubbishRaider.V_GRANULE_SIZE,
+
+                    float xPos = col * RubbishRaider.H_GRANULE_SIZE - cameraPosition.x;
+                    float yPos = row * RubbishRaider.V_GRANULE_SIZE - cameraPosition.y;
+
+                    app.rect(xPos, yPos,
                             RubbishRaider.H_GRANULE_SIZE, RubbishRaider.V_GRANULE_SIZE);
                 }
             }
