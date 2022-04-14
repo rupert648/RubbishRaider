@@ -7,31 +7,31 @@ import java.util.Properties;
 
 public class RubbishRaider extends PApplet {
 
+    // game size
+    final static int MY_WIDTH = 1024;
+    final static int MY_HEIGHT = 768;
+    // How many pieces (cells in the dungeon level) are we dividing the play area into, horizontally and vertically
+    final static int V_GRANULES = 90;
+    final static int H_GRANULES = 100;
+    // map contents
+    final static int EMPTY = 0;
+    final static int WALL = 1;
+    // and how big are they?
+    final static int V_GRANULE_SIZE = MY_HEIGHT / V_GRANULES;
+    final static int H_GRANULE_SIZE = MY_WIDTH / H_GRANULES;
+    // the current level
+    public Level currentLevel = new Level(this);
     GameState gm = GameState.GENERATING;
     Properties config = new Properties();
     String configFilePath = "./src/configuration/RubbishRaider.config";
 
-    // game size
-    final static int MY_WIDTH = 1024 ;
-    final static int MY_HEIGHT = 768 ;
-
-    // How many pieces (cells in the dungeon level) are we dividing the play area into, horizontally and vertically
-    final static int V_GRANULES = 90 ;
-    final static int H_GRANULES = 100 ;
-
-    // map contents
-    final static int EMPTY = 0 ;
-    final static int WALL = 1 ;
-
-    // and how big are they?
-    final static int V_GRANULE_SIZE = MY_HEIGHT/V_GRANULES ;
-    final static int H_GRANULE_SIZE = MY_WIDTH/H_GRANULES ;
-
-    // the current level
-    public Level currentLevel = new Level(this) ;
+    public static void main(String[] args) {
+        RubbishRaider main = new RubbishRaider();
+        PApplet.runSketch(new String[]{"RubbishRaider"}, main);
+    }
 
     public void settings() {
-        size(MY_WIDTH, MY_HEIGHT) ;
+        size(MY_WIDTH, MY_HEIGHT);
     }
 
     // initialise screen and particle array
@@ -72,9 +72,9 @@ public class RubbishRaider extends PApplet {
     }
 
     private void playGame() {
-        background(128) ;
+        background(128);
 
-        currentLevel.render() ;
+        currentLevel.render();
     }
 
     private void lost() {
@@ -88,11 +88,6 @@ public class RubbishRaider extends PApplet {
 
         currentLevel.generateLevel();
 
-        gm = GameState.PLAYING ;
-    }
-
-    public static void main(String[] args) {
-        RubbishRaider main = new RubbishRaider();
-        PApplet.runSketch(new String[]{"RubbishRaider"}, main);
+        gm = GameState.PLAYING;
     }
 }

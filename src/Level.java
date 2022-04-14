@@ -2,14 +2,13 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.Random;
+
 import Level.MapGenerationNode;
 
 public class Level {
-    PApplet app;
-
     final int NUMB_OF_ATTEMPTS = 100;
     final int ROOM_SIZE = 15;
-
+    PApplet app;
     private int[][] map;
 
     public Level(PApplet app) {
@@ -17,9 +16,9 @@ public class Level {
 
         map = new int[RubbishRaider.V_GRANULES][RubbishRaider.H_GRANULES];
     }
-    
+
     public void generateLevel() {
-        MapGenerationNode start = new MapGenerationNode(new PVector(0,0), new PVector(RubbishRaider.H_GRANULES-1, RubbishRaider.V_GRANULES-1));
+        MapGenerationNode start = new MapGenerationNode(new PVector(0, 0), new PVector(RubbishRaider.H_GRANULES - 1, RubbishRaider.V_GRANULES - 1));
 
         generationRecur(start, 0);
 
@@ -27,7 +26,7 @@ public class Level {
 
         for (int i = 0; i < RubbishRaider.H_GRANULES; i++) {
             map[0][i] = RubbishRaider.WALL;
-            map[RubbishRaider.V_GRANULES-1][i] = RubbishRaider.WALL;
+            map[RubbishRaider.V_GRANULES - 1][i] = RubbishRaider.WALL;
         }
         // ensure edges are walls
         for (int i = 0; i < RubbishRaider.V_GRANULES; i++) {
@@ -119,10 +118,10 @@ public class Level {
 
     private int getDistRight(MapGenerationNode current, int colToSplit, int i) {
         int distRight = 0;
-        while (colToSplit -distRight >= 0
-                && map[i][colToSplit -distRight] != RubbishRaider.WALL
+        while (colToSplit - distRight >= 0
+                && map[i][colToSplit - distRight] != RubbishRaider.WALL
                 // check below
-                && colToSplit -distRight > current.topLeft.x
+                && colToSplit - distRight > current.topLeft.x
         ) {
             distRight++;
         }
@@ -132,10 +131,10 @@ public class Level {
     private int getDistLeft(MapGenerationNode current, int colToSplit, int i) {
         // get distance to wall on left & right
         int distLeft = 0;
-        while (colToSplit +distLeft < map[0].length
-                && map[i][colToSplit +distLeft] != RubbishRaider.WALL
+        while (colToSplit + distLeft < map[0].length
+                && map[i][colToSplit + distLeft] != RubbishRaider.WALL
                 // check below
-                && colToSplit +distLeft < current.bottomRight.x
+                && colToSplit + distLeft < current.bottomRight.x
         ) {
             distLeft++;
         }
@@ -230,19 +229,20 @@ public class Level {
 
     private int getDistBelow(MapGenerationNode current, int rowToSplit, int i) {
         int distBelow = 0;
-        while (rowToSplit +distBelow < map.length
-            && map[rowToSplit +distBelow][i] != RubbishRaider.WALL
-            && rowToSplit +distBelow < current.bottomRight.y
+        while (rowToSplit + distBelow < map.length
+                && map[rowToSplit + distBelow][i] != RubbishRaider.WALL
+                && rowToSplit + distBelow < current.bottomRight.y
         ) {
-            distBelow++; }
+            distBelow++;
+        }
         return distBelow;
     }
 
     private int getDistAbove(MapGenerationNode current, int rowToSplit, int i) {
         int distAbove = 0;
-        while (rowToSplit -distAbove >= 0
-            && map[rowToSplit -distAbove][i] != RubbishRaider.WALL
-            && rowToSplit -distAbove > current.topLeft.y
+        while (rowToSplit - distAbove >= 0
+                && map[rowToSplit - distAbove][i] != RubbishRaider.WALL
+                && rowToSplit - distAbove > current.topLeft.y
         ) {
             distAbove++;
         }
@@ -278,15 +278,14 @@ public class Level {
                 if (map[row][col] == RubbishRaider.WALL) {
 
                     // check surrounding for air space
-                    if ((row+1 < map.length && map[row+1][col] == RubbishRaider.EMPTY) ||
-                            (row-1 >= 0 && map[row-1][col] == RubbishRaider.EMPTY)  ||
-                            (col+1 < map[0].length && map[row][col+1] == RubbishRaider.EMPTY) ||
-                            (col-1 >= 0 && map[row][col-1] == RubbishRaider.EMPTY)
+                    if ((row + 1 < map.length && map[row + 1][col] == RubbishRaider.EMPTY) ||
+                            (row - 1 >= 0 && map[row - 1][col] == RubbishRaider.EMPTY) ||
+                            (col + 1 < map[0].length && map[row][col + 1] == RubbishRaider.EMPTY) ||
+                            (col - 1 >= 0 && map[row][col - 1] == RubbishRaider.EMPTY)
                     ) {
                         app.stroke(0);
                         app.fill(0);
-                    }
-                    else {
+                    } else {
                         app.stroke(255, 140, 0);
                         app.fill(255, 140, 0);
                     }
