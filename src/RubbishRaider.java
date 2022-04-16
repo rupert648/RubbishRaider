@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import Level.TileType;
+
 public class RubbishRaider extends PApplet {
 
     // game size
@@ -13,9 +15,7 @@ public class RubbishRaider extends PApplet {
     // How many pieces (cells in the dungeon level) are we dividing the play area into, horizontally and vertically
     final static int V_GRANULES = 90;
     final static int H_GRANULES = 100;
-    // map contents
-    final static int EMPTY = 0;
-    final static int WALL = 1;
+
     // and how big are they?
     final static int V_GRANULE_SIZE = 10;
     final static int H_GRANULE_SIZE = 10;

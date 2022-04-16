@@ -3,18 +3,29 @@ import processing.core.PVector;
 
 import java.util.Random;
 
-import Level.MapGenerationNode;
+import Level.*;
 
 public class Level {
+    // room colours
+    PVector bathroom = new PVector(173, 216, 230);
+    PVector generic = new PVector(220, 220, 220);
+    PVector bedroom = new PVector(255, 215, 0);
+    PVector kitchen = new PVector(255, 255, 255);
+    PVector livingRoom = new PVector(0, 255, 0);
+    PVector wall = new PVector(0, 0, 0);
+    PVector defaultCol = new PVector(255, 0, 0);
+    PVector bedDuvet = new PVector(0, 0,220);
+    PVector bedPillow = new PVector(255, 255, 255);
+
     final int NUMB_OF_ATTEMPTS = 100;
     final int ROOM_SIZE = 15;
     PApplet app;
-    private int[][] map;
+    private TileType[][] map;
 
     public Level(PApplet app) {
         this.app = app;
 
-        map = new int[RubbishRaider.V_GRANULES][RubbishRaider.H_GRANULES];
+        map = new TileType[RubbishRaider.V_GRANULES][RubbishRaider.H_GRANULES];
     }
 
     public void generateLevel() {
@@ -22,16 +33,19 @@ public class Level {
 
         generationRecur(start, 0);
 
-        // ensure edges are walls
+        // create rooms
+        RoomGenerator rg = new RoomGenerator(map);
+        rg.fillRooms(start);
+        map = rg.getMap();
 
-        for (int i = 0; i < RubbishRaider.H_GRANULES; i++) {
-            map[0][i] = RubbishRaider.WALL;
-            map[RubbishRaider.V_GRANULES - 1][i] = RubbishRaider.WALL;
-        }
         // ensure edges are walls
+        for (int i = 0; i < RubbishRaider.H_GRANULES; i++) {
+            map[0][i] = TileType.WALL;
+            map[RubbishRaider.V_GRANULES - 1][i] = TileType.WALL;
+        }
         for (int i = 0; i < RubbishRaider.V_GRANULES; i++) {
-            map[i][0] = RubbishRaider.WALL;
-            map[i][RubbishRaider.H_GRANULES - 1] = RubbishRaider.WALL;
+            map[i][0] = TileType.WALL;
+            map[i][RubbishRaider.H_GRANULES - 1] = TileType.WALL;
         }
     }
 
@@ -57,7 +71,7 @@ public class Level {
 
         // draw col in
         for (int i = (int) current.topLeft.y; i < current.bottomRight.y; i++) {
-            map[i][colToSplit] = RubbishRaider.WALL;
+            map[i][colToSplit] = TileType.WALL;
         }
 
         // make doorway
@@ -119,7 +133,7 @@ public class Level {
     private int getDistRight(MapGenerationNode current, int colToSplit, int i) {
         int distRight = 0;
         while (colToSplit - distRight >= 0
-                && map[i][colToSplit - distRight] != RubbishRaider.WALL
+                && map[i][colToSplit - distRight] != TileType.WALL
                 // check below
                 && colToSplit - distRight > current.topLeft.x
         ) {
@@ -132,7 +146,7 @@ public class Level {
         // get distance to wall on left & right
         int distLeft = 0;
         while (colToSplit + distLeft < map[0].length
-                && map[i][colToSplit + distLeft] != RubbishRaider.WALL
+                && map[i][colToSplit + distLeft] != TileType.WALL
                 // check below
                 && colToSplit + distLeft < current.bottomRight.x
         ) {
@@ -148,14 +162,14 @@ public class Level {
         int removed = 0;
         while (val1 + x < current.bottomRight.y && removed < 10) {
             int c = val1 + x;
-            map[c][colToSplit] = RubbishRaider.EMPTY;
+            map[c][colToSplit] = TileType.EMPTY;
 
             x++;
             removed++;
         }
         while (val1 - y > current.topLeft.y && removed < 10) {
             int c = val1 - y;
-            map[c][colToSplit] = RubbishRaider.EMPTY;
+            map[c][colToSplit] = TileType.EMPTY;
 
             y++;
             removed++;
@@ -169,7 +183,7 @@ public class Level {
 
         // draw row in
         for (int i = (int) current.topLeft.x; i < current.bottomRight.x; i++) {
-            map[rowToSplit][i] = RubbishRaider.WALL;
+            map[rowToSplit][i] = TileType.WALL;
         }
 
         buildHoleHorizontal(current, random, rowToSplit);
@@ -230,7 +244,7 @@ public class Level {
     private int getDistBelow(MapGenerationNode current, int rowToSplit, int i) {
         int distBelow = 0;
         while (rowToSplit + distBelow < map.length
-                && map[rowToSplit + distBelow][i] != RubbishRaider.WALL
+                && map[rowToSplit + distBelow][i] != TileType.WALL
                 && rowToSplit + distBelow < current.bottomRight.y
         ) {
             distBelow++;
@@ -241,7 +255,7 @@ public class Level {
     private int getDistAbove(MapGenerationNode current, int rowToSplit, int i) {
         int distAbove = 0;
         while (rowToSplit - distAbove >= 0
-                && map[rowToSplit - distAbove][i] != RubbishRaider.WALL
+                && map[rowToSplit - distAbove][i] != TileType.WALL
                 && rowToSplit - distAbove > current.topLeft.y
         ) {
             distAbove++;
@@ -257,14 +271,14 @@ public class Level {
         int removed = 0;
         while (val1 + x < current.bottomRight.x && removed < 10) {
             int c = val1 + x;
-            map[rowToSplit][c] = RubbishRaider.EMPTY;
+            map[rowToSplit][c] = TileType.EMPTY;
 
             x++;
             removed++;
         }
         while (val1 - y > current.topLeft.x && removed < 10) {
             int c = val1 - y;
-            map[rowToSplit][c] = RubbishRaider.EMPTY;
+            map[rowToSplit][c] = TileType.EMPTY;
 
             y++;
             removed++;
@@ -275,30 +289,63 @@ public class Level {
         app.fill(0);
         for (int row = 0; row < RubbishRaider.V_GRANULES; row++) {
             for (int col = 0; col < RubbishRaider.H_GRANULES; col++) {
-                if (map[row][col] == RubbishRaider.WALL) {
 
-                    // check surrounding for air space
-                    if ((row + 1 < map.length && map[row + 1][col] == RubbishRaider.EMPTY) ||
-                            (row - 1 >= 0 && map[row - 1][col] == RubbishRaider.EMPTY) ||
-                            (col + 1 < map[0].length && map[row][col + 1] == RubbishRaider.EMPTY) ||
-                            (col - 1 >= 0 && map[row][col - 1] == RubbishRaider.EMPTY)
-                    ) {
-                        app.stroke(0);
-                        app.fill(0);
-                    } else {
-                        app.stroke(255, 140, 0);
-                        app.fill(255, 140, 0);
-                    }
+                setColour(map[row][col]);
 
-                    float xPos = col * RubbishRaider.H_GRANULE_SIZE - cameraPosition.x;
-                    float yPos = row * RubbishRaider.V_GRANULE_SIZE - cameraPosition.y;
+                float xPos = col * RubbishRaider.H_GRANULE_SIZE - cameraPosition.x;
+                float yPos = row * RubbishRaider.V_GRANULE_SIZE - cameraPosition.y;
 
-                    app.rect(xPos, yPos,
-                            RubbishRaider.H_GRANULE_SIZE, RubbishRaider.V_GRANULE_SIZE);
-                }
+                app.rect(xPos, yPos,
+                        RubbishRaider.H_GRANULE_SIZE, RubbishRaider.V_GRANULE_SIZE);
+
             }
         }
         app.fill(0);
-        app.stroke(0);
+    }
+
+    public void setColour(TileType t) {
+        if (t == null) {
+            app.fill(255, 0, 0);
+            return;
+        }
+
+        switch (t) {
+            case BATHROOM -> {
+                app.fill(bathroom.x, bathroom.y, bathroom.z);
+                app.stroke(bathroom.x, bathroom.y, bathroom.z);
+            }
+            case GENERIC -> {
+                app.fill(generic.x, generic.y, generic.z);
+                app.stroke(generic.x, generic.y, generic.z);
+            }
+            case BEDROOM -> {
+                app.fill(bedroom.x, bedroom.y, bedroom.z);
+                app.stroke(bedroom.x, bedroom.y, bedroom.z);
+            }
+            case KITCHEN -> {
+                app.fill(kitchen.x, kitchen.y, kitchen.z);
+                app.stroke(kitchen.x, kitchen.y, kitchen.z);
+            }
+            case LIVING_ROOM -> {
+                app.fill(livingRoom.x, livingRoom.y, livingRoom.z);
+                app.stroke(livingRoom.x, livingRoom.y, livingRoom.z);
+            }
+            case WALL -> {
+                app.fill(wall.x, wall.y, wall.z);
+                app.stroke(wall.x, wall.y, wall.z);
+            }
+            case BED_DUVET -> {
+                app.fill(bedDuvet.x, bedDuvet.y, bedDuvet.z);
+                app.stroke(bedDuvet.x, bedDuvet.y, bedDuvet.z);
+            }
+            case BED_PILLOW -> {
+                app.fill(bedPillow.x, bedPillow.y, bedPillow.z);
+                app.stroke(bedPillow.x, bedPillow.y, bedPillow.z);
+            }
+            default -> {
+                app.fill(defaultCol.x, defaultCol.y, defaultCol.z);
+                app.stroke(defaultCol.x, defaultCol.y, defaultCol.z);
+            }
+        }
     }
 }
