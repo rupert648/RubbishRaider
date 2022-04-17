@@ -1,9 +1,15 @@
 package Level;
 
-public abstract class Furniture {
+public class Furniture {
     // each item of furniture is defined by 2D array containing TileTypes
 
-    public static TileType[][] bed() {
+    TileType[][] tileArray;
+
+    public Furniture(TileType[][] tileArray) {
+        this.tileArray = tileArray;
+    }
+
+    public static Furniture bed() {
         // TODO: store as CSVs and load in on program start
 
         TileType[][] obj = {
@@ -18,6 +24,16 @@ public abstract class Furniture {
                 {TileType.BED_DUVET, TileType.BED_DUVET, TileType.BED_DUVET, TileType.BED_DUVET, TileType.BED_DUVET, TileType.BED_DUVET, TileType.BED_DUVET },
         };
 
-        return obj;
+        return new Furniture(obj);
+    }
+
+    public static Furniture cupboard() {
+        TileType[][] obj = {
+                { TileType.CABINET, TileType.CABINET, TileType.CABINET, TileType.CABINET, TileType.CABINET },
+                { TileType.CABINET, TileType.CABINET, TileType.CABINET, TileType.CABINET, TileType.CABINET },
+                { TileType.CABINET, TileType.CABINET, TileType.CABINET, TileType.CABINET, TileType.CABINET },
+        };
+
+        return new Furniture(obj);
     }
 }

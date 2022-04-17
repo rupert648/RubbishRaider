@@ -16,6 +16,7 @@ public class Level {
     PVector defaultCol = new PVector(255, 0, 0);
     PVector bedDuvet = new PVector(0, 0,220);
     PVector bedPillow = new PVector(255, 255, 255);
+    PVector cabinet = new PVector(165, 42, 42);
 
     final int NUMB_OF_ATTEMPTS = 100;
     final int ROOM_SIZE = 15;
@@ -160,14 +161,14 @@ public class Level {
         int x = 0;
         int y = 0;
         int removed = 0;
-        while (val1 + x < current.bottomRight.y && removed < 10) {
+        while (val1 + x < current.bottomRight.y && removed < 5) {
             int c = val1 + x;
             map[c][colToSplit] = TileType.EMPTY;
 
             x++;
             removed++;
         }
-        while (val1 - y > current.topLeft.y && removed < 10) {
+        while (val1 - y > current.topLeft.y && removed < 5) {
             int c = val1 - y;
             map[c][colToSplit] = TileType.EMPTY;
 
@@ -309,6 +310,8 @@ public class Level {
             return;
         }
 
+        // tile colouring
+
         switch (t) {
             case BATHROOM -> {
                 app.fill(bathroom.x, bathroom.y, bathroom.z);
@@ -341,6 +344,10 @@ public class Level {
             case BED_PILLOW -> {
                 app.fill(bedPillow.x, bedPillow.y, bedPillow.z);
                 app.stroke(bedPillow.x, bedPillow.y, bedPillow.z);
+            }
+            case CABINET -> {
+                app.fill(cabinet.x, cabinet.y, cabinet.z);
+                app.stroke(cabinet.x, cabinet.y, cabinet.z);
             }
             default -> {
                 app.fill(defaultCol.x, defaultCol.y, defaultCol.z);

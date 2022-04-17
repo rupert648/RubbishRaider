@@ -13,4 +13,7 @@ public enum TileType {
     // bed
     BED_PILLOW,
     BED_DUVET,
+
+    // cabinet
+    CABINET,
 }

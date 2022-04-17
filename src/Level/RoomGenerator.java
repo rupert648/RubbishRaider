@@ -2,9 +2,17 @@ package Level;
 
 import processing.core.PVector;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class RoomGenerator {
+
+    // todo: need to maintain this, could tidy up data structures to better represent furniture tiles
+    TileType[] furnitureTiles = {
+            TileType.BED_DUVET,
+            TileType.BED_PILLOW,
+            TileType.CABINET
+    };
 
     private TileType[][] map;
 
@@ -57,15 +65,22 @@ public class RoomGenerator {
 
     private void addFurniture(MapGenerationNode current, TileType roomType) {
         if (roomType == TileType.BEDROOM) {
-            // only trying beds for now
-            TileType[][] furnitureArray = Furniture.bed();
+
+            Furniture bed = Furniture.bed();
+            Furniture cupboard = Furniture.cupboard();
             // try and place in the top left of room
-            // TODO: random pos against wall
             Random rn = new Random();
 
-            int orientation = rn.nextInt(4);
+            // TODO: ensure that furniture doesn't overlap
 
-            placeBed(current, furnitureArray, orientation);
+            // place bed
+            int orientation = rn.nextInt(4);
+            placeFurniture(current, bed, orientation);
+
+            // place cupboard
+            orientation = rn.nextInt(4);
+            placeFurniture(current, cupboard, orientation);
+
         }
     }
 
@@ -100,78 +115,194 @@ public class RoomGenerator {
         return TileType.GENERIC;
     }
 
-    public void placeBed(MapGenerationNode current, TileType[][] furnitureArray, int orientation) {
+    public void placeFurniture(MapGenerationNode current, Furniture furniture, int orientation) {
         switch (orientation) {
-            case 0 -> placeFurnitureNorth(current, furnitureArray);
-            case 1 -> placeFurnitureSouth(current, furnitureArray);
-            case 2 -> placeFurnitureEast(current, furnitureArray);
-            case 3 -> placeFurnitureWest(current, furnitureArray);
+            case 0 -> placeFurnitureNorth(current, furniture);
+            case 1 -> placeFurnitureSouth(current, furniture);
+            case 2 -> placeFurnitureEast(current, furniture);
+            case 3 -> placeFurnitureWest(current, furniture);
         }
     }
 
-    private void placeFurnitureWest(MapGenerationNode current, TileType[][] furnitureArray) {
+    private void placeFurnitureWest(MapGenerationNode current, Furniture f) {
         Random rn = new Random();
+
+        TileType[][] tileArray = f.tileArray;
+
         // random xPos
         int startX = (int) current.topLeft.x;
-        int startY = (int) current.topLeft.y +  rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - furnitureArray.length));
+        int startY = -1;
 
-        // iterate furniture array
-        for (int i = 0; i < furnitureArray.length; i++) {
-            for (int j = 0; j < furnitureArray[0].length; j++ ) {
-                TileType furnitureTile = furnitureArray[i][j];
+        // iterate until find startY which doesn't overlap other furniture
+        boolean isValid = false;
+        while (!isValid) {
+            // random Y
+            startY = (int) current.topLeft.y +  rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - tileArray.length));
+
+            // check not next to door
+            if (startX - 1 >= 0 && map[startY][startX-1] == TileType.EMPTY) {
+                continue;
+            }
+
+            isValid = true;
+
+            // iterate furniture array
+            outerLoop:
+            for (int i = 0; i < tileArray.length; i++) {
+                for (int j = 0; j < tileArray[0].length; j++ ) {
+                    if (isFurnitureTile(map[startY + j][startX + i])) {
+                        isValid = false;
+                        break outerLoop;
+                    }
+                }
+            }
+        }
+
+        // place tiles
+        for (int i = 0; i < tileArray.length; i++) {
+            for (int j = 0; j < tileArray[0].length; j++ ) {
+                TileType furnitureTile = tileArray[i][j];
                 // map[row][column]
                 map[startY + j][startX + i] = furnitureTile;
             }
         }
     }
 
-    private void placeFurnitureEast(MapGenerationNode current, TileType[][] furnitureArray) {
+    private void placeFurnitureEast(MapGenerationNode current, Furniture f) {
         Random rn = new Random();
+
+        TileType[][] tileArray = f.tileArray;
+
         // random xPos
-        int startX = (int) current.bottomRight.x - furnitureArray[0].length;
-        int startY = (int) current.topLeft.y +  rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - furnitureArray.length));
+        int startX = (int) current.bottomRight.x - tileArray[0].length;
+        int startY = -1;
+
+        // iterate until find startY which doesn't overlap other furniture
+        boolean isValid = false;
+        while (!isValid) {
+            // random Y
+            startY = (int) current.topLeft.y +  rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - tileArray.length));
+
+            // check not next to door
+            if (startX + 1 < map[0].length && map[startY][startX+1] == TileType.EMPTY) {
+                continue;
+            }
+
+            isValid = true;
+
+            // iterate furniture array
+            outerLoop:
+            for (int i = 0; i < tileArray.length; i++) {
+                for (int j = 0; j < tileArray[0].length; j++ ) {
+                    if (isFurnitureTile(map[startY + j][startX + (tileArray[0].length - 1 - i)])) {
+                        isValid = false;
+                        break outerLoop;
+                    }
+                }
+            }
+        }
 
         // iterate furniture array
-        for (int i = 0; i < furnitureArray.length; i++) {
-            for (int j = 0; j < furnitureArray[0].length; j++ ) {
-                TileType furnitureTile = furnitureArray[i][j];
+        for (int i = 0; i < tileArray.length; i++) {
+            for (int j = 0; j < tileArray[0].length; j++ ) {
+                TileType furnitureTile = tileArray[i][j];
                 // map[row][column]
-                map[startY + j][startX + (furnitureArray[0].length - 1 - i)] = furnitureTile;
+                map[startY + j][startX + (tileArray[0].length - 1 - i)] = furnitureTile;
             }
         }
     }
 
-    private void placeFurnitureSouth(MapGenerationNode current, TileType[][] furnitureArray) {
+    private void placeFurnitureSouth(MapGenerationNode current, Furniture f) {
         Random rn = new Random();
+
+        TileType[][] tileArray = f.tileArray;
+
         // random xPos
-        int startX = (int) current.topLeft.x +  rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - furnitureArray[0].length));
-        int startY = (int) current.bottomRight.y - furnitureArray.length;
+
+        int startY = (int) current.bottomRight.y - tileArray.length;
+        int startX = -1;
+
+        // iterate until find startY which doesn't overlap other furniture
+        boolean isValid = false;
+        while (!isValid) {
+            // random Y
+            startX = (int) current.topLeft.x +  rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - tileArray[0].length));
+
+            // check not next to door
+            // TODO: check this for every tile?
+            if (startY + 1 < map.length && map[startY+1][startX] == TileType.EMPTY) {
+                continue;
+            }
+
+            isValid = true;
+
+            // iterate furniture array
+            outerLoop:
+            for (int i = tileArray.length - 1; i >= 0; i--) {
+                for (int j = 0; j < tileArray[0].length; j++ ) {
+                    if (isFurnitureTile(map[startY + (tileArray.length - 1 - i)][startX + j])) {
+                        isValid = false;
+                        break outerLoop;
+                    }
+                }
+            }
+        }
 
         // iterate furniture array
-        for (int i = furnitureArray.length - 1; i >= 0; i--) {
-            for (int j = 0; j < furnitureArray[0].length; j++ ) {
-                TileType furnitureTile = furnitureArray[i][j];
+        for (int i = tileArray.length - 1; i >= 0; i--) {
+            for (int j = 0; j < tileArray[0].length; j++ ) {
+                TileType furnitureTile = tileArray[i][j];
                 // map[row][column]
-                map[startY + (furnitureArray.length - 1 - i)][startX + j] = furnitureTile;
+                map[startY + (tileArray.length - 1 - i)][startX + j] = furnitureTile;
             }
         }
     }
 
-    private void placeFurnitureNorth(MapGenerationNode current, TileType[][] furnitureArray) {
+    private void placeFurnitureNorth(MapGenerationNode current, Furniture f) {
         Random rn = new Random();
+        TileType[][] tileArray = f.tileArray;
+
         // random xPos
-        int startX = (int) current.topLeft.x +  rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - furnitureArray[0].length));
-//        int startY = rn.nextBoolean() ? (int) current.topLeft.y : (int) current.bottomRight.y - furnitureArray.length;
         int startY = (int) current.topLeft.y;
+        int startX = -1;
+
+        // iterate until find startY which doesn't overlap other furniture
+        boolean isValid = false;
+        while (!isValid) {
+            // random Y
+            startX = (int) current.topLeft.x +  rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - tileArray[0].length));
+
+            // check not next to door
+            if (startY - 1 >= 0 && map[startY-1][startX] == TileType.EMPTY) {
+                continue;
+            }
+
+            isValid = true;
+
+            // iterate furniture array
+            outerLoop:
+            for (int i = 0; i < tileArray.length; i++) {
+                for (int j = 0; j < tileArray[0].length; j++ ) {
+                    if (isFurnitureTile(map[startY + i][startX + j])) {
+                        isValid = false;
+                        break outerLoop;
+                    }
+                }
+            }
+        }
 
         // iterate furniture array
-        for (int i = 0; i < furnitureArray.length; i++) {
-            for (int j = 0; j < furnitureArray[0].length; j++ ) {
-                TileType furnitureTile = furnitureArray[i][j];
+        for (int i = 0; i < tileArray.length; i++) {
+            for (int j = 0; j < tileArray[0].length; j++ ) {
+                TileType furnitureTile = tileArray[i][j];
                 // map[row][column]
                 map[startY + i][startX + j] = furnitureTile;
             }
         }
+    }
+
+    private boolean isFurnitureTile(TileType t) {
+        return Arrays.asList(furnitureTiles).contains(t);
     }
 
 }
