@@ -71,12 +71,6 @@ public class Camera {
     private void drawEnemyCone(Enemy enemy) {
         float xm = enemy.position.x - position.x, ym = enemy.position.y - position.y ;
 
-        float cos = cos(enemy.orientation);
-        float sin = sin(enemy.orientation);
-//
-//        float posx = xm + GameConstants.VISION_SIZE * cos;
-//        float posy = ym + GameConstants.VISION_SIZE * sin;
-
         float x1, y1, x2, y2;
         x1 = xm + GameConstants.VISION_SIZE * cos(enemy.orientation + radians(CONE_ANGLE)/2);
         y1 = ym + GameConstants.VISION_SIZE * sin(enemy.orientation + radians(CONE_ANGLE)/2);
@@ -90,6 +84,21 @@ public class Camera {
         applet.fill(0, 0, 200);
         applet.circle(player.position.x - position.x, player.position.y - position.y, 20);
         applet.fill(0);
+    }
+
+    public void center(Player player) {
+        float x, y;
+        x = player.position.x - MY_WIDTH/2;
+        y = player.position.y - MY_HEIGHT/2;
+
+        // update target pos for player
+        player.targetPos.x += position.x - x;
+        player.targetPos.y += position.y - y;
+
+        position.x = x;
+        position.y = y;
+
+
     }
 
     public void movingLeft() {

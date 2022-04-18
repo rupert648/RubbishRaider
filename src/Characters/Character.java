@@ -1,4 +1,5 @@
 package Characters;
+import Camera.Camera;
 import Constants.GameConstants;
 import Level.Level;
 import processing.core.PApplet;
@@ -15,7 +16,7 @@ public abstract class Character extends Movable {
     final float SLOW_RADIUS = 20f ;
     final float TARGET_RADIUS = 3f ;
     final float DRAG = 0.95f ;
-    private static final float SIGHT_RADIUS = 200;
+    private static final float SIGHT_RADIUS = 100;
 
     public PApplet applet;
     // I'm allowing public access to keep things snappy
@@ -193,16 +194,17 @@ public abstract class Character extends Movable {
         if( p.position.dist(this.position) < SIGHT_RADIUS ) {
             // within seeing range
             // perform DDA
-            return efficientDDA(position, p.position);
+//            return efficientDDA(position, p.position);
 
         }
 
         return false;
     }
 
-    public boolean efficientDDA(PVector start, PVector end) {
+    public boolean efficientDDA(PVector start, PVector end, Camera camera) {
         float dx = end.x - start.x;
         float dy = end.y - start.y;
+        applet.line(start.x, start.y, end.x, end.y);
         PVector rayDir = new PVector(dx, dy);
 
         // more optimal step size
@@ -241,10 +243,11 @@ public abstract class Character extends Movable {
         // Perform "Walk" until collision or range check
         boolean bTileFound = false;
         // only search up until the player
-        float fMaxDistance = min(SIGHT_RADIUS, rayDir.mag());
+        float fMaxDistance = rayDir.mag();
         float fDistance = 0.0f;
         while (!bTileFound && fDistance < fMaxDistance)
         {
+            System.out.println("fDistance: " + fDistance + ",  fMaxDistance: " + fMaxDistance);
             // Walk along shortest path
             if (vRayLength1D.x < vRayLength1D.y)
             {
@@ -260,18 +263,20 @@ public abstract class Character extends Movable {
             }
 
             // Test tile at new test point
-            if (vMapCheck.x >= 0 && vMapCheck.x < applet.width && vMapCheck.y >= 0 && vMapCheck.y < applet.height)
+            if (vMapCheck.x >= 0 && vMapCheck.y >= 0)
             {
+                applet.stroke(255, 0, 0);
+                applet.circle(vMapCheck.x, vMapCheck.y, 1);
+                applet.stroke(0);
 
-                int row = (int) vMapCheck.y / GameConstants.V_GRANULE_SIZE;
-                int col = (int) vMapCheck.x / GameConstants.H_GRANULE_SIZE;
+                int row = (int) (vMapCheck.y + camera.position.y) / GameConstants.V_GRANULE_SIZE;
+                int col = (int) (vMapCheck.x + camera.position.x) / GameConstants.H_GRANULE_SIZE;
                 if (level.getMap()[row][col] == TileType.WALL)
                 {
                     bTileFound = true;
                 }
             }
         }
-
         return !bTileFound;
     }
 

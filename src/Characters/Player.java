@@ -39,6 +39,14 @@ public class Player extends Character {
         applet.fill(255, 255, 0);
         applet.circle(targetPos.x, targetPos.y, 10);
         applet.fill(0);
+
+        // if has line of site of target
+        PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
+        if (efficientDDA(temp, targetPos, camera)) {
+            PVector p = new PVector(targetPos.x - temp.x, targetPos.y - temp.y);
+            kinematicSeekPoint(p);
+            return;
+        }
         
         // calculate position in grid square
         int playerCol = (int) position.x / GameConstants.H_GRANULE_SIZE;

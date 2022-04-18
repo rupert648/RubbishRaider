@@ -89,17 +89,12 @@ public class RubbishRaider extends PApplet {
     }
 
     public void keyPressed() {
-        if (key == 'a') {
-            camera.movingLeft() ;
-        }
-        if (key == 'd') {
-            camera.movingRight() ;
-        }
-        if (key == 'w') {
-            camera.movingUp() ;
-        }
-        if (key == 's') {
-            camera.movingDown() ;
+        switch (key) {
+            case 'a' -> camera.movingLeft();
+            case 'd' -> camera.movingRight();
+            case 'w' -> camera.movingUp();
+            case 's' -> camera.movingDown();
+            case ' ' -> camera.center(player);
         }
     }
     

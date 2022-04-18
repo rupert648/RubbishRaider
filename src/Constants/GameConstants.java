@@ -17,7 +17,7 @@ public abstract class GameConstants {
     public static int PLAYER_SIZE_Y = 10;
 
     // camera
-    public static float CAMERA_SPEED = 2.0f;
+    public static float CAMERA_SPEED = 10.0f;
 
     // enemy constants
     public static float VISION_SIZE = 100.0f;
