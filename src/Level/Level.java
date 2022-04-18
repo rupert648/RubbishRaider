@@ -1,9 +1,11 @@
+package Level;
+
+import characters.Movable;
 import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.Random;
-
-import Level.*;
+import Constants.*;
 
 public class Level {
     // room colours
@@ -26,11 +28,11 @@ public class Level {
     public Level(PApplet app) {
         this.app = app;
 
-        map = new TileType[RubbishRaider.V_GRANULES][RubbishRaider.H_GRANULES];
+        map = new TileType[GameConstants.V_GRANULES][GameConstants.H_GRANULES];
     }
 
     public void generateLevel() {
-        MapGenerationNode start = new MapGenerationNode(new PVector(0, 0), new PVector(RubbishRaider.H_GRANULES - 1, RubbishRaider.V_GRANULES - 1));
+        MapGenerationNode start = new MapGenerationNode(new PVector(0, 0), new PVector(GameConstants.H_GRANULES - 1, GameConstants.V_GRANULES - 1));
 
         generationRecur(start, 0);
 
@@ -40,13 +42,13 @@ public class Level {
         map = rg.getMap();
 
         // ensure edges are walls
-        for (int i = 0; i < RubbishRaider.H_GRANULES; i++) {
+        for (int i = 0; i < GameConstants.H_GRANULES; i++) {
             map[0][i] = TileType.WALL;
-            map[RubbishRaider.V_GRANULES - 1][i] = TileType.WALL;
+            map[GameConstants.V_GRANULES - 1][i] = TileType.WALL;
         }
-        for (int i = 0; i < RubbishRaider.V_GRANULES; i++) {
+        for (int i = 0; i < GameConstants.V_GRANULES; i++) {
             map[i][0] = TileType.WALL;
-            map[i][RubbishRaider.H_GRANULES - 1] = TileType.WALL;
+            map[i][GameConstants.H_GRANULES - 1] = TileType.WALL;
         }
     }
 
@@ -288,20 +290,168 @@ public class Level {
 
     public void render(PVector cameraPosition) {
         app.fill(0);
-        for (int row = 0; row < RubbishRaider.V_GRANULES; row++) {
-            for (int col = 0; col < RubbishRaider.H_GRANULES; col++) {
+        for (int row = 0; row < GameConstants.V_GRANULES; row++) {
+            for (int col = 0; col < GameConstants.H_GRANULES; col++) {
 
                 setColour(map[row][col]);
 
-                float xPos = col * RubbishRaider.H_GRANULE_SIZE - cameraPosition.x;
-                float yPos = row * RubbishRaider.V_GRANULE_SIZE - cameraPosition.y;
+                float xPos = col * GameConstants.H_GRANULE_SIZE - cameraPosition.x;
+                float yPos = row * GameConstants.V_GRANULE_SIZE - cameraPosition.y;
 
                 app.rect(xPos, yPos,
-                        RubbishRaider.H_GRANULE_SIZE, RubbishRaider.V_GRANULE_SIZE);
+                        GameConstants.H_GRANULE_SIZE, GameConstants.V_GRANULE_SIZE);
 
             }
         }
         app.fill(0);
+    }
+
+    // W
+    // W* ---
+    // W
+    public boolean collidesXLeft(Movable object) {
+        int charX = (int) object.position.x;
+        int charCol = charX / GameConstants.H_GRANULE_SIZE;
+        int charY = (int) object.position.y;
+        int charRow = charY / GameConstants.V_GRANULE_SIZE;
+
+        for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+            int col = charCol - 1;
+            int row = charRow + rowOffset;
+
+            // check in bounds
+            if (row >= map.length || row < 0 || col >= map[row].length || col < 0) {
+                return false;
+            }
+
+            if (map[row][col] == TileType.WALL) {
+                int blockX = col * GameConstants.H_GRANULE_SIZE;
+                int blockY = row * GameConstants.V_GRANULE_SIZE;
+                if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (charX - (blockX + GameConstants.H_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (blockY - charY > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                if (charY - (blockY + GameConstants.V_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //   W
+    //  *W ---
+    //   W
+    public boolean collidesXRight(Movable object) {
+        int charX = (int) object.position.x;
+        int charCol = charX / GameConstants.H_GRANULE_SIZE;
+        int charY = (int) object.position.y;
+        int charRow = charY / GameConstants.V_GRANULE_SIZE;
+
+        for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+            int col = charCol + 1;
+            int row = charRow + rowOffset;
+
+            // check in bounds
+            if (row >= map.length || row < 0 || col >= map[row].length || col < 0) {
+                return false;
+            }
+
+            if (map[row][col] == TileType.WALL) {
+                int blockX = col * GameConstants.H_GRANULE_SIZE;
+                int blockY = row * GameConstants.V_GRANULE_SIZE;
+                if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (charX - (blockX + GameConstants.H_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (blockY - charY > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                if (charY - (blockY + GameConstants.V_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // WWW
+    //  * ---
+    public boolean collidesYUp(Movable object) {
+        int charX = (int) object.position.x;
+        int charCol = charX / GameConstants.H_GRANULE_SIZE;
+        int charY = (int) object.position.y;
+        int charRow = charY / GameConstants.V_GRANULE_SIZE;
+
+        for (int colOffset = -1; colOffset <= 1; colOffset++) {
+            int col = charCol + colOffset;
+            int row = charRow - 1;
+
+            // check in bounds
+            if (row >= map.length || row < 0 || col >= map[row].length || col < 0) {
+                return false;
+            }
+
+            if (map[row][col] == TileType.WALL) {
+                int blockX = col * GameConstants.H_GRANULE_SIZE;
+                int blockY = row * GameConstants.V_GRANULE_SIZE;
+                if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (charX - (blockX + GameConstants.H_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (blockY - charY > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                if (charY - (blockY + GameConstants.V_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    // Still a problem. If have: x
+    //                          WW  and travelling SW st that overlap both W at once
+    // then will reverse both. Naturally want the y only to be reversed here.
+    // But if had:  Wx
+    //              WW _would_ want both reversed and:
+    // if had x
+    //       W   travelling SW also want them both reversed!
+    // Solution seems to be rules mapping the above patterns to decisions
+
+    //  *
+    // WWW ---
+    public boolean collidesYDown(Movable object) {
+        int charX = (int) object.position.x;
+        int charCol = charX / GameConstants.H_GRANULE_SIZE;
+        int charY = (int) object.position.y;
+        int charRow = charY / GameConstants.V_GRANULE_SIZE;
+
+        for (int colOffset = -1; colOffset <= 1; colOffset++) {
+            int col = charCol + colOffset;
+            int row = charRow + 1;
+
+            // check in bounds
+            if (row >= map.length || row < 0 || col >= map[row].length || col < 0) {
+                return false;
+            }
+
+            if (map[row][col] == TileType.WALL) {
+                int blockX = col * GameConstants.H_GRANULE_SIZE;
+                int blockY = row * GameConstants.V_GRANULE_SIZE;
+                if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (charX - (blockX + GameConstants.H_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_X / 2)
+                    continue;
+                if (blockY - charY > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                if (charY - (blockY + GameConstants.V_GRANULE_SIZE) > GameConstants.PLAYER_SIZE_Y / 2)
+                    continue;
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setColour(TileType t) {
@@ -354,5 +504,9 @@ public class Level {
                 app.stroke(defaultCol.x, defaultCol.y, defaultCol.z);
             }
         }
+    }
+
+    public TileType[][] getMap() {
+        return this.map;
     }
 }

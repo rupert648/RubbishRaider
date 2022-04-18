@@ -1,32 +1,22 @@
+import Level.Level;
+import characters.*;
+import Constants.*;
+import characters.Character;
 import processing.core.PApplet;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Properties;
-
-import Level.TileType;
+import static Constants.GameConstants.PLAYER_SIZE_X;
+import static Constants.GameConstants.PLAYER_SIZE_Y;
 
 public class RubbishRaider extends PApplet {
-
-    // game size
-    final static int MY_WIDTH = 1024;
-    final static int MY_HEIGHT = 768;
-    // How many pieces (cells in the dungeon level) are we dividing the play area into, horizontally and vertically
-    final static int V_GRANULES = 90;
-    final static int H_GRANULES = 100;
-
-    // and how big are they?
-    final static int V_GRANULE_SIZE = 10;
-    final static int H_GRANULE_SIZE = 10;
     // the current level
     public Level currentLevel = new Level(this);
     // the camera
-    public Camera camera = new Camera();
+    public Camera camera = new Camera(this);
 
     GameState gm = GameState.GENERATING;
-    Properties config = new Properties();
-    String configFilePath = "./src/configuration/RubbishRaider.config";
+
+    // characters
+    Enemy e = new Enemy(0,0,0, this, currentLevel, 0.8f, .1f);
 
     public static void main(String[] args) {
         RubbishRaider main = new RubbishRaider();
@@ -34,22 +24,11 @@ public class RubbishRaider extends PApplet {
     }
 
     public void settings() {
-        size(MY_WIDTH, MY_HEIGHT);
+        size(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
     }
 
     // initialise screen and particle array
     public void setup() {
-        // load configuration
-        try (FileInputStream fis = new FileInputStream(configFilePath)) {
-            config.load(fis);
-        } catch (FileNotFoundException e) {
-            System.out.println("Configuration File Not Found");
-            System.exit(1);
-        } catch (IOException e) {
-            System.out.println("Issue loading in configuration");
-            System.exit(1);
-        }
-
         newLevel();
     }
 
@@ -65,9 +44,6 @@ public class RubbishRaider extends PApplet {
     }
 
     private void menu() {
-        float width = Float.parseFloat(config.getProperty("GAME_WIDTH"));
-        float height = Float.parseFloat(config.getProperty("GAME_HEIGHT"));
-
         background(0);
     }
 
@@ -78,6 +54,18 @@ public class RubbishRaider extends PApplet {
         background(128);
 
         camera.render(currentLevel);
+
+        renderUpdateEnemies();
+    }
+
+    private void renderUpdateEnemies() {
+        renderUpdateEnemy(e);
+    }
+
+    private void renderUpdateEnemy(Enemy enemy) {
+        camera.drawEnemy(enemy);
+
+        enemy.integrate() ;
     }
 
     private void lost() {
