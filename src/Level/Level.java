@@ -1,6 +1,6 @@
 package Level;
 
-import characters.Movable;
+import Characters.Movable;
 import processing.core.PApplet;
 import processing.core.PVector;
 

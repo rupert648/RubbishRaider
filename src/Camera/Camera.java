@@ -1,5 +1,8 @@
+package Camera;
+
 import Level.Level;
-import characters.Enemy;
+import Characters.Enemy;
+import Characters.Player;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -28,7 +31,7 @@ public class Camera {
         this.position = new PVector(0,0);
     }
 
-    public void integrate() {
+    public void integrate(Player player) {
         if (movingLeft) {
             velocity.x = -1 * maxSpeed;
         } else if (movingRight) {
@@ -41,6 +44,9 @@ public class Camera {
         } else velocity.y = 0;
 
         position.add(velocity);
+
+        // update targetPos
+        player.targetPos.sub(velocity);
     }
 
     public void render(Level current) {
@@ -60,35 +66,41 @@ public class Camera {
         applet.ellipse(newxm - position.x, newym - position.y, PLAYER_SIZE_X/3,PLAYER_SIZE_Y/3) ;
     }
 
-    void movingLeft() {
+    public void drawPlayer(Player player) {
+        applet.fill(0, 0, 200);
+        applet.circle(player.position.x - position.x, player.position.y - position.y, 20);
+        applet.fill(0);
+    }
+
+    public void movingLeft() {
         movingLeft = true;
     }
 
-    void stopMovingLeft() {
+    public void stopMovingLeft() {
         movingLeft = false;
     }
 
-    void movingRight() {
+    public void movingRight() {
         movingRight = true;
     }
 
-    void stopMovingRight() {
+    public void stopMovingRight() {
         movingRight = false;
     }
 
-    void movingUp() {
+    public void movingUp() {
         movingUp = true;
     }
 
-    void stopMovingUp() {
+    public void stopMovingUp() {
         movingUp = false;
     }
 
-    void movingDown() {
+    public void movingDown() {
         movingDown = true;
     }
 
-    void stopMovingDown() {
+    public void stopMovingDown() {
         movingDown = false;
     }
 }

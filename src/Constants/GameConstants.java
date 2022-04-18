@@ -9,8 +9,8 @@ public abstract class GameConstants {
     public static int H_GRANULES = 100;
 
     // and how big are they?
-    public static int V_GRANULE_SIZE = 10;
-    public static int H_GRANULE_SIZE = 10;
+    public static int V_GRANULE_SIZE = 20;
+    public static int H_GRANULE_SIZE = 20;
 
     // player size
     public static int PLAYER_SIZE_X = 10;

@@ -1,4 +1,4 @@
-package characters;
+package Characters;
 import Constants.GameConstants;
 import Level.Level;
 import processing.core.PApplet;

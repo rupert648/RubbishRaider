@@ -1,4 +1,4 @@
-package characters;
+package Characters;
 
 import processing.core.PVector;
 

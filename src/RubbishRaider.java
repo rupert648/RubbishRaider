@@ -1,11 +1,8 @@
+import Camera.Camera;
 import Level.Level;
-import characters.*;
+import Characters.*;
 import Constants.*;
-import characters.Character;
 import processing.core.PApplet;
-
-import static Constants.GameConstants.PLAYER_SIZE_X;
-import static Constants.GameConstants.PLAYER_SIZE_Y;
 
 public class RubbishRaider extends PApplet {
     // the current level
@@ -16,7 +13,8 @@ public class RubbishRaider extends PApplet {
     GameState gm = GameState.GENERATING;
 
     // characters
-    Enemy e = new Enemy(0,0,0, this, currentLevel, 0.8f, .1f);
+    Player player = new Player(GameConstants.MY_WIDTH / 2,GameConstants.MY_HEIGHT / 2,0, 0, 0, this, currentLevel, 1.0f, 1.0f);
+    Enemy e = new Enemy(GameConstants.MY_WIDTH / 2,GameConstants.MY_HEIGHT / 2,0, this, currentLevel, 0.8f, .1f);
 
     public static void main(String[] args) {
         RubbishRaider main = new RubbishRaider();
@@ -30,6 +28,7 @@ public class RubbishRaider extends PApplet {
     // initialise screen and particle array
     public void setup() {
         newLevel();
+        player.setPathFinder();
     }
 
     // update particles, render.
@@ -53,10 +52,16 @@ public class RubbishRaider extends PApplet {
     private void playGame() {
         background(128);
 
-        camera.integrate();
+        camera.integrate(player);
         camera.render(currentLevel);
 
+        renderUpdatePlayer();
         renderUpdateEnemies();
+    }
+
+    private void renderUpdatePlayer() {
+        player.integrate(camera);
+        camera.drawPlayer(player);
     }
 
     private void renderUpdateEnemies() {
@@ -111,5 +116,10 @@ public class RubbishRaider extends PApplet {
         if (key == 's') {
             camera.stopMovingDown() ;
         }
+    }
+
+    public void mouseClicked() {
+        // set target pos
+        player.setTargetPos(mouseX, mouseY);
     }
 }

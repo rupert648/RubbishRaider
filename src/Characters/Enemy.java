@@ -1,10 +1,8 @@
-package characters;
+package Characters;
 
 import Level.Level;
 import processing.core.PApplet;
 import processing.core.PVector;
-
-import java.util.ArrayList;
 
 public class Enemy extends Character {
 
