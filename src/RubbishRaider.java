@@ -11,7 +11,7 @@ public class RubbishRaider extends PApplet {
     // the current level
     public Level currentLevel = new Level(this);
     // the camera
-    public Camera camera = new Camera(this);
+    public Camera camera = new Camera(this, GameConstants.CAMERA_SPEED);
 
     GameState gm = GameState.GENERATING;
 
@@ -53,6 +53,7 @@ public class RubbishRaider extends PApplet {
     private void playGame() {
         background(128);
 
+        camera.integrate();
         camera.render(currentLevel);
 
         renderUpdateEnemies();
@@ -84,16 +85,31 @@ public class RubbishRaider extends PApplet {
 
     public void keyPressed() {
         if (key == 'a') {
-            camera.position.x -= 5;
+            camera.movingLeft() ;
         }
         if (key == 'd') {
-            camera.position.x += 5;
+            camera.movingRight() ;
         }
         if (key == 'w') {
-            camera.position.y -= 5;
+            camera.movingUp() ;
         }
         if (key == 's') {
-            camera.position.y += 5;
+            camera.movingDown() ;
+        }
+    }
+    
+    public void keyReleased() {
+        if (key == 'a') {
+            camera.stopMovingLeft() ;
+        }
+        if (key == 'd') {
+            camera.stopMovingRight() ;
+        }
+        if (key == 'w') {
+            camera.stopMovingUp() ;
+        }
+        if (key == 's') {
+            camera.stopMovingDown() ;
         }
     }
 }

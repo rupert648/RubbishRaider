@@ -15,4 +15,7 @@ public abstract class GameConstants {
     // player size
     public static int PLAYER_SIZE_X = 10;
     public static int PLAYER_SIZE_Y = 10;
+
+    // camera
+    public static float CAMERA_SPEED = 2.0f;
 }
