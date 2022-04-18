@@ -1,13 +1,13 @@
 package Camera;
 
+import Constants.GameConstants;
 import Level.Level;
 import Characters.Enemy;
 import Characters.Player;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import static Constants.GameConstants.PLAYER_SIZE_X;
-import static Constants.GameConstants.PLAYER_SIZE_Y;
+import static Constants.GameConstants.*;
 import static processing.core.PApplet.*;
 
 public class Camera {
@@ -56,6 +56,8 @@ public class Camera {
     public void drawEnemy(Enemy enemy) {
         float xm = enemy.position.x, ym = enemy.position.y ;
 
+        drawEnemyCone(enemy);
+
         enemy.colour();
 
         applet.ellipse(xm - position.x, ym - position.y,  PLAYER_SIZE_X, PLAYER_SIZE_Y) ;
@@ -64,6 +66,24 @@ public class Camera {
         int newym = (int)(ym + PLAYER_SIZE_Y/3 * sin(enemy.orientation)) ;
         applet.fill(0);
         applet.ellipse(newxm - position.x, newym - position.y, PLAYER_SIZE_X/3,PLAYER_SIZE_Y/3) ;
+    }
+
+    private void drawEnemyCone(Enemy enemy) {
+        float xm = enemy.position.x - position.x, ym = enemy.position.y - position.y ;
+
+        float cos = cos(enemy.orientation);
+        float sin = sin(enemy.orientation);
+//
+//        float posx = xm + GameConstants.VISION_SIZE * cos;
+//        float posy = ym + GameConstants.VISION_SIZE * sin;
+
+        float x1, y1, x2, y2;
+        x1 = xm + GameConstants.VISION_SIZE * cos(enemy.orientation + radians(CONE_ANGLE)/2);
+        y1 = ym + GameConstants.VISION_SIZE * sin(enemy.orientation + radians(CONE_ANGLE)/2);
+        x2 = xm + GameConstants.VISION_SIZE * cos(enemy.orientation - radians(CONE_ANGLE)/2);
+        y2 = ym + GameConstants.VISION_SIZE * sin(enemy.orientation - radians(CONE_ANGLE)/2);
+
+        applet.triangle(xm, ym, x1, y1, x2, y2);
     }
 
     public void drawPlayer(Player player) {

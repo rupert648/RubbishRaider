@@ -18,4 +18,8 @@ public abstract class GameConstants {
 
     // camera
     public static float CAMERA_SPEED = 2.0f;
+
+    // enemy constants
+    public static float VISION_SIZE = 100.0f;
+    public static int CONE_ANGLE = 50;
 }

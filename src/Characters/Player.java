@@ -54,8 +54,7 @@ public class Player extends Character {
         if (!pathFound) {
             findPath(targetRow, targetCol, playerRow, playerCol);
             currentAstarPathIndex = 0;
-        }
-        if (pathFound && thePath != null && currentAstarPathIndex < thePath.size()) {
+        } else if (thePath != null && currentAstarPathIndex < thePath.size()) {
             // draw path
             for (AStarNode node: thePath) {
                 // get positions
