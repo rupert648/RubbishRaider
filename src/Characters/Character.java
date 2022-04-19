@@ -247,7 +247,6 @@ public abstract class Character extends Movable {
         float fDistance = 0.0f;
         while (!bTileFound && fDistance < fMaxDistance)
         {
-            System.out.println("fDistance: " + fDistance + ",  fMaxDistance: " + fMaxDistance);
             // Walk along shortest path
             if (vRayLength1D.x < vRayLength1D.y)
             {
@@ -262,52 +261,16 @@ public abstract class Character extends Movable {
                 vRayLength1D.y += unitStepSize.y;
             }
 
-            // Test tile at new test point
-            if (vMapCheck.x >= 0 && vMapCheck.y >= 0)
-            {
-                applet.stroke(255, 0, 0);
-                applet.circle(vMapCheck.x, vMapCheck.y, 1);
-                applet.stroke(0);
-
-                int row = (int) (vMapCheck.y + camera.position.y) / GameConstants.V_GRANULE_SIZE;
-                int col = (int) (vMapCheck.x + camera.position.x) / GameConstants.H_GRANULE_SIZE;
-                if (level.getMap()[row][col] == TileType.WALL)
-                {
-                    bTileFound = true;
-                }
+            applet.stroke(255, 0, 0);
+            applet.circle(vMapCheck.x, vMapCheck.y, 1);
+            applet.stroke(0);
+            
+            int row = (int) (vMapCheck.y + camera.position.y) / GameConstants.V_GRANULE_SIZE;
+            int col = (int) (vMapCheck.x + camera.position.x) / GameConstants.H_GRANULE_SIZE;
+            if (level.getMap()[row][col] == TileType.WALL) {
+                bTileFound = true;
             }
         }
         return !bTileFound;
-    }
-
-    public boolean regularDDA(PVector start, PVector end) {
-        int dx = (int) end.x - (int) start.x;
-        int dy = (int) end.y - (int) start.y;
-
-        // less optimal but simpler version
-        int steps = Math.max(abs(dx), abs(dy));
-
-        //  calculate increment in x & y for each steps
-        float xInc = dx / (float) steps;
-        float yInc = dy / (float) steps;
-
-        // iterate through each point
-        float x = start.x;
-        float y = start.y;
-        for (int i = 0; i <= steps; i++) {
-            // draw circle to visualise
-            applet.circle(x, y, 2);
-            // get block at this point
-            int col = (int) x / GameConstants.H_GRANULE_SIZE;
-            int row = (int) y / GameConstants.V_GRANULE_SIZE;
-            if (level.getMap()[row][col] == TileType.WALL) {
-                return false;
-            }
-
-            x += xInc;
-            y += yInc;
-        }
-
-        return true;
     }
 }

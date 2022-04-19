@@ -42,6 +42,7 @@ public class Player extends Character {
 
         // if has line of site of target
         PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
+
         if (efficientDDA(temp, targetPos, camera)) {
             PVector p = new PVector(targetPos.x - temp.x, targetPos.y - temp.y);
             kinematicSeekPoint(p);
@@ -63,35 +64,41 @@ public class Player extends Character {
             findPath(targetRow, targetCol, playerRow, playerCol);
             currentAstarPathIndex = 0;
         } else if (thePath != null && currentAstarPathIndex < thePath.size()) {
+
             // draw path
             for (AStarNode node: thePath) {
                 // get positions
                 int x = node.getCol() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE/2;
                 int y = node.getRow() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE/2;
 
-                applet.circle(x - camera.position.x, y - camera.position.y, 10);
+                applet.circle(x - camera.position.x, y - camera.position.y, 2);
             }
 
-            // set direction to next node
-            // whilst not in next node, move towards it
-            // seek center of the next node
+            // iterate from this and find last path that can be directly seen.
+            for (int i = currentAstarPathIndex; i < thePath.size(); i++) {
+                AStarNode current = thePath.get(i);
+                PVector currentVector = new PVector(0, 0);
+                currentVector.x = (current.getCol() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE/2);
+                currentVector.y = (current.getRow() * GameConstants.V_GRANULE_SIZE + GameConstants.V_GRANULE_SIZE/2);
+
+                // include camera
+                currentVector.sub(camera.position);
+
+                if (!efficientDDA(temp, currentVector, camera)) {
+                    currentAstarPathIndex = i - 1;
+                    break;
+                }
+            }
+
+            // seek first visible path
             AStarNode nextSquare = thePath.get(currentAstarPathIndex);
             PVector nextSquareCoords = new PVector(0,0);
             nextSquareCoords.x = nextSquare.getCol() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE/2;
             nextSquareCoords.y = nextSquare.getRow() * GameConstants.V_GRANULE_SIZE + GameConstants.V_GRANULE_SIZE/2;
+            nextSquareCoords.sub(camera.position);
 
-            // calculate distance between position and next square point
-            float dist = nextSquareCoords.dist(position);
-            if (dist < GameConstants.H_GRANULE_SIZE / 2) {
-                // close to center, update value
-                currentAstarPathIndex++;
-            }
-
-            // use next coords to calc direction
-            nextSquareCoords.sub(position);
-
-            // use kinematic search so doesn't slow down every square
-            kinematicSeekPoint(nextSquareCoords);
+            PVector p = new PVector(nextSquareCoords.x - temp.x, nextSquareCoords.y - temp.y);
+            kinematicSeekPoint(p);
         }
     }
 
