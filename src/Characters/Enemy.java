@@ -6,11 +6,11 @@ import processing.core.PVector;
 
 public class Enemy extends Character {
 
-    public Enemy(int x, int y, float or, PApplet applet, Level level, float maxSpeed, float maxAcceleration){
-        super(applet, level, maxSpeed, maxAcceleration, new PVector(0,0));
-        position = new PVector(x, y) ;
-        orientation = or ;
-        velocity = new PVector(1f, 1f) ;
+    public Enemy(int x, int y, float or, PApplet applet, Level level, float maxSpeed, float maxAcceleration) {
+        super(applet, level, maxSpeed, maxAcceleration, new PVector(0, 0));
+        position = new PVector(x, y);
+        orientation = or;
+        velocity = new PVector(1f, 1f);
     }
 
     public void integrate() {
@@ -48,6 +48,6 @@ public class Enemy extends Character {
 //                }
 //            }
 //        }
-        wander();
+//        wander();
     }
 }

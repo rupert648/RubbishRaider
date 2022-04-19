@@ -9,7 +9,8 @@ public class AStarNode implements Comparable<AStarNode> {
     // Coordinates in original map
     // position in original map
     PVector position;
-    private int row, col ;
+    private final int row;
+    private final int col ;
     // During A* search the node from which we arrived here
     private AStarNode prevNode ;
     // Book keeping for A*. Visited could be determined by membership of open list, but this is cheaper.

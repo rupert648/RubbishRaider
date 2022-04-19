@@ -13,8 +13,8 @@ public class RubbishRaider extends PApplet {
     GameState gm = GameState.GENERATING;
 
     // characters
-    Player player = new Player(GameConstants.MY_WIDTH / 2,GameConstants.MY_HEIGHT / 2,0, 0, 0, this, currentLevel, 1.0f, 1.0f);
-    Enemy e = new Enemy(GameConstants.MY_WIDTH / 2,GameConstants.MY_HEIGHT / 2,0, this, currentLevel, 0.8f, .1f);
+    Player player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 3.0f, 1.0f);
+    Enemy e = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, 0.8f, .1f);
 
     public static void main(String[] args) {
         RubbishRaider main = new RubbishRaider();
@@ -61,7 +61,7 @@ public class RubbishRaider extends PApplet {
 
     private void renderUpdatePlayer() {
         player.integrate(camera);
-        camera.drawPlayer(player);
+        camera.drawPlayer(player, e);
     }
 
     private void renderUpdateEnemies() {
@@ -71,7 +71,7 @@ public class RubbishRaider extends PApplet {
     private void renderUpdateEnemy(Enemy enemy) {
         camera.drawEnemy(enemy);
 
-        enemy.integrate() ;
+        enemy.integrate();
     }
 
     private void lost() {
@@ -97,24 +97,24 @@ public class RubbishRaider extends PApplet {
             case ' ' -> camera.center(player);
         }
     }
-    
+
     public void keyReleased() {
         if (key == 'a') {
-            camera.stopMovingLeft() ;
+            camera.stopMovingLeft();
         }
         if (key == 'd') {
-            camera.stopMovingRight() ;
+            camera.stopMovingRight();
         }
         if (key == 'w') {
-            camera.stopMovingUp() ;
+            camera.stopMovingUp();
         }
         if (key == 's') {
-            camera.stopMovingDown() ;
+            camera.stopMovingDown();
         }
     }
 
     public void mouseClicked() {
         // set target pos
-        player.setTargetPos(mouseX, mouseY);
+        player.setTargetPos(mouseX, mouseY, camera);
     }
 }

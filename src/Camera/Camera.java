@@ -28,7 +28,7 @@ public class Camera {
         this.maxSpeed = maxSpeed;
 
         this.velocity = new PVector(0, 0);
-        this.position = new PVector(0,0);
+        this.position = new PVector(0, 0);
     }
 
     public void integrate(Player player) {
@@ -54,42 +54,48 @@ public class Camera {
     }
 
     public void drawEnemy(Enemy enemy) {
-        float xm = enemy.position.x, ym = enemy.position.y ;
+        float xm = enemy.position.x, ym = enemy.position.y;
 
         drawEnemyCone(enemy);
 
         enemy.colour();
 
-        applet.ellipse(xm - position.x, ym - position.y,  PLAYER_SIZE_X, PLAYER_SIZE_Y) ;
+        applet.ellipse(xm - position.x, ym - position.y, PLAYER_SIZE_X, PLAYER_SIZE_Y);
         // Show orientation
-        int newxm = (int)(xm + PLAYER_SIZE_X/3 * cos(enemy.orientation)) ;
-        int newym = (int)(ym + PLAYER_SIZE_Y/3 * sin(enemy.orientation)) ;
+        int newxm = (int) (xm + PLAYER_SIZE_X / 3 * cos(enemy.orientation));
+        int newym = (int) (ym + PLAYER_SIZE_Y / 3 * sin(enemy.orientation));
         applet.fill(0);
-        applet.ellipse(newxm - position.x, newym - position.y, PLAYER_SIZE_X/3,PLAYER_SIZE_Y/3) ;
+        applet.ellipse(newxm - position.x, newym - position.y, PLAYER_SIZE_X / 3, PLAYER_SIZE_Y / 3);
     }
 
     private void drawEnemyCone(Enemy enemy) {
-        float xm = enemy.position.x - position.x, ym = enemy.position.y - position.y ;
+        float xm = enemy.position.x - position.x, ym = enemy.position.y - position.y;
 
         float x1, y1, x2, y2;
-        x1 = xm + GameConstants.VISION_SIZE * cos(enemy.orientation + radians(CONE_ANGLE)/2);
-        y1 = ym + GameConstants.VISION_SIZE * sin(enemy.orientation + radians(CONE_ANGLE)/2);
-        x2 = xm + GameConstants.VISION_SIZE * cos(enemy.orientation - radians(CONE_ANGLE)/2);
-        y2 = ym + GameConstants.VISION_SIZE * sin(enemy.orientation - radians(CONE_ANGLE)/2);
+        x1 = xm + GameConstants.VISION_SIZE * cos(enemy.orientation + radians(CONE_ANGLE) / 2);
+        y1 = ym + GameConstants.VISION_SIZE * sin(enemy.orientation + radians(CONE_ANGLE) / 2);
+        x2 = xm + GameConstants.VISION_SIZE * cos(enemy.orientation - radians(CONE_ANGLE) / 2);
+        y2 = ym + GameConstants.VISION_SIZE * sin(enemy.orientation - radians(CONE_ANGLE) / 2);
 
-        applet.triangle(xm, ym, x1, y1, x2, y2);
+        applet.stroke(200, 0, 0);
+        applet.line(xm, ym, x1, y1);
+        applet.line(xm, ym, x2, y2);
+        applet.line(x1, y1, x2, y2);
+        applet.stroke(0);
     }
 
-    public void drawPlayer(Player player) {
+    public void drawPlayer(Player player, Enemy enemy) {
         applet.fill(0, 0, 200);
         applet.circle(player.position.x - position.x, player.position.y - position.y, 20);
         applet.fill(0);
+
+        player.drawStep(this, enemy);
     }
 
     public void center(Player player) {
         float x, y;
-        x = player.position.x - MY_WIDTH/2;
-        y = player.position.y - MY_HEIGHT/2;
+        x = player.position.x - MY_WIDTH / 2;
+        y = player.position.y - MY_HEIGHT / 2;
 
         // update target pos for player
         player.targetPos.x += position.x - x;
