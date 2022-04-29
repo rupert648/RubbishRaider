@@ -123,7 +123,6 @@ public class Player extends Character {
             return;
         }
 
-        // calculate targetPos relative to map
         targetPos.x = x;
         targetPos.y = y;
 
@@ -170,13 +169,20 @@ public class Player extends Character {
         // TODO: prevent calc if enemy can already see player
 
         PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
-        if (temp.dist(enemy.position) < dist) {
-            // turn enemy to face player
-            PVector t = new PVector(0, 0);
-            t.x = position.x - enemy.position.x;
-            t.y = position.y - enemy.position.y;
+        PVector enemyTemp = new PVector(enemy.position.x - camera.position.x, enemy.position.y - camera.position.y);
 
-            enemy.orientation = t.heading();
+        // TODO: currently only track if can hear
+        if (position.dist(enemy.position) < dist) {
+            if (efficientDDA(enemyTemp, temp, camera)) {
+                // has line of sight of target
+                enemy.trackPlayer();
+            } else {
+                enemy.stopTracking();
+                // remember where last heard
+                enemy.goToLocation(position);
+            }
+        } else {
+            enemy.stopTracking();
         }
     }
 }
