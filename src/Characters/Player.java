@@ -14,15 +14,8 @@ import processing.core.PVector;
 
 import java.util.ArrayList;
 
-public class Player extends Character {
+public class Player extends AStarCharacter {
     public PVector targetPos;
-
-    // A*
-    boolean findingPath = false;
-    boolean pathFound = true;
-    int currentAstarPathIndex = 0;
-    AStarSearch pathFinder;
-    ArrayList<AStarNode> thePath = null;
 
     // Step (sound radius)
     int currentStepRadius = 0;
@@ -36,10 +29,6 @@ public class Player extends Character {
         velocity = new PVector(xVel, yVel);
         rotation = 0;
         targetPos = new PVector(x, y);
-    }
-
-    public void setPathFinder() {
-        pathFinder = new AStarSearch(level, applet);
     }
 
     public void integrate(Camera camera) {
@@ -62,6 +51,10 @@ public class Player extends Character {
             return;
         }
 
+        aStar(temp, camera, targetPos);
+    }
+
+    void aStar(PVector temp, Camera camera, PVector targetPos) {
         // calculate position in grid square
         int playerCol = (int) position.x / GameConstants.H_GRANULE_SIZE;
         int playerRow = (int) position.y / GameConstants.V_GRANULE_SIZE;
@@ -130,18 +123,6 @@ public class Player extends Character {
         pathFound = false;
     }
 
-    public void findPath(int monsterRow, int monsterCol, int playerRow, int playerCol) {
-        pathFound = false;
-        findingPath = true;
-        ArrayList<AStarNode> result = pathFinder.search(monsterRow, monsterCol, playerRow, playerCol);
-        // failure is represented as a null return
-        if (result != null) {
-            thePath = result;
-            pathFound = true;
-        }
-
-        findingPath = false;
-    }
 
     public boolean moving() {
         return velocity.x > 0.5f || velocity.y > 0.5f
