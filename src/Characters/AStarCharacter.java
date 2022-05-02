@@ -27,7 +27,7 @@ public abstract class AStarCharacter extends Character {
         pathFinder = new AStarSearch(level, applet);
     }
 
-    void aStar(PVector temp, Camera camera, PVector targetPos) {
+    boolean aStar(PVector temp, Camera camera, PVector targetPos, float scalar) {
         // calculate position in grid square
         int enemyCol = (int) position.x / GameConstants.H_GRANULE_SIZE;
         int enemyRow = (int) position.y / GameConstants.V_GRANULE_SIZE;
@@ -44,8 +44,8 @@ public abstract class AStarCharacter extends Character {
 
             // break out if we've reached the end
             if (currentAstarPathIndex == thePath.size()-1) {
-                targetPos = null;
-                return;
+                // reached the end of path; indicate by returning true
+                return true;
             }
 
             // draw path
@@ -73,8 +73,10 @@ public abstract class AStarCharacter extends Character {
             nextSquareCoords.sub(camera.position);
 
             PVector p = new PVector(nextSquareCoords.x - temp.x, nextSquareCoords.y - temp.y);
-            kinematicSeekPoint(p);
+            kinematicSeekPoint(p, scalar);
         }
+
+        return false;
     }
 
     public void findPath(int monsterRow, int monsterCol, int playerRow, int playerCol) {

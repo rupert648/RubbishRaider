@@ -4,15 +4,11 @@ import Camera.Camera;
 import Constants.GameConstants;
 import Level.Level;
 import PathFinding.AStarNode;
-import PathFinding.AStarSearch;
 import processing.core.PApplet;
 import Level.TileType;
 
-import static processing.core.PApplet.*;
-
 import processing.core.PVector;
 
-import java.util.ArrayList;
 
 public class Player extends AStarCharacter {
     public PVector targetPos;
@@ -47,7 +43,7 @@ public class Player extends AStarCharacter {
         // if has line of site of target
         if (efficientDDA(temp, targetPos, camera)) {
             PVector p = new PVector(targetPos.x - temp.x, targetPos.y - temp.y);
-            kinematicSeekPoint(p);
+            kinematicSeekPoint(p, 1.0f);
             return;
         }
 
@@ -102,7 +98,7 @@ public class Player extends AStarCharacter {
             nextSquareCoords.sub(camera.position);
 
             PVector p = new PVector(nextSquareCoords.x - temp.x, nextSquareCoords.y - temp.y);
-            kinematicSeekPoint(p);
+            kinematicSeekPoint(p, 1.0f);
         }
     }
 
@@ -134,9 +130,6 @@ public class Player extends AStarCharacter {
         if (!moving()) return;
 
         if (currentStepRadius < GameConstants.STEP_SOUND_RADIUS) {
-            // check if any enemies within sound radius
-            checkIfCanHear(GameConstants.STEP_SOUND_RADIUS, enemy, camera);
-
             applet.noFill();
             applet.ellipse(position.x - camera.position.x, position.y - camera.position.y, currentStepRadius, currentStepRadius);
             currentStepRadius += GameConstants.STEP_RADIUS_INCR;
@@ -146,24 +139,5 @@ public class Player extends AStarCharacter {
         }
     }
 
-    public void checkIfCanHear(int dist, Enemy enemy, Camera camera) {
-        // TODO: prevent calc if enemy can already see player
 
-        PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
-        PVector enemyTemp = new PVector(enemy.position.x - camera.position.x, enemy.position.y - camera.position.y);
-
-        // TODO: currently only track if can hear
-        if (position.dist(enemy.position) < dist) {
-            if (efficientDDA(enemyTemp, temp, camera)) {
-                // has line of sight of target
-                enemy.trackPlayer();
-            } else {
-                enemy.stopTracking();
-                // remember where last heard
-                enemy.goToLocation(position);
-            }
-        } else {
-            enemy.stopTracking();
-        }
-    }
 }

@@ -3,12 +3,14 @@ package Characters;
 import Camera.Camera;
 import Constants.GameConstants;
 import Level.Level;
-import PathFinding.AStarNode;
-import PathFinding.AStarSearch;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import java.util.ArrayList;
+import static Constants.GameConstants.CONE_ANGLE;
+import static processing.core.PApplet.*;
+import static processing.core.PApplet.radians;
+
 
 public class Enemy extends AStarCharacter {
 
@@ -27,28 +29,96 @@ public class Enemy extends AStarCharacter {
     }
 
 
-    public void integrate(Camera camera) {
+    public void integrate(Camera camera, Player player) {
+        if (playerInVision(camera, player)) {
+            trackingPlayer = true;
+        } else {
+            trackingPlayer = false;
+            checkIfCanHearPlayer(GameConstants.STEP_SOUND_RADIUS, player, camera);
+        }
 
         PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
 
         if (trackingPlayer) {
             // track player!
-            pursueCharacter(player);
+            pursueCharacter(player, 2f);
+
+            // set orientation
+            orientation = velocity.heading();
             return;
         }
 
         if (lastHeardPosition != null) {
             if (position.dist(lastHeardPosition) < GameConstants.H_GRANULE_SIZE / 4.0f) {
-                System.out.println("reached last heard position");
                 lastHeardPosition = null;
                 return;
             }
 
-            aStar(temp, camera, lastHeardPosition);
+            if (aStar(temp, camera, lastHeardPosition, 1.5f)) {
+                lastHeardPosition = null;
+            }
+
+            // set orientation
+            orientation = velocity.heading();
             return;
         }
 
         wander();
+    }
+
+    public boolean playerInVision(Camera camera, Player player) {
+        // check within range of cone before wasting time doing calcs
+        if (player.position.dist(position) > GameConstants.VISION_SIZE) return false;
+
+        // check have line of site.
+        PVector playerTemp = new PVector(player.position.x - camera.position.x, player.position.y - camera.position.y);
+        PVector enemyTemp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
+        if (efficientDDA(playerTemp, enemyTemp, camera)) {
+            // cone check
+            // http://www.jeffreythompson.org/collision-detection/tri-point.php
+
+            // calculate points of triangle
+            // one is simply pos of enemy
+            float x1, y1, x2, y2;
+            x1 = enemyTemp.x + GameConstants.VISION_SIZE * cos(orientation + radians(CONE_ANGLE) / 2);
+            y1 = enemyTemp.y + GameConstants.VISION_SIZE * sin(orientation + radians(CONE_ANGLE) / 2);
+            x2 = enemyTemp.x + GameConstants.VISION_SIZE * cos(orientation - radians(CONE_ANGLE) / 2);
+            y2 = enemyTemp.y + GameConstants.VISION_SIZE * sin(orientation - radians(CONE_ANGLE) / 2);
+
+            boolean result = pointTriangleCollision(
+                    x1, y1,
+                    x2, y2,
+                    enemyTemp.x, enemyTemp.y,
+                    playerTemp.x, playerTemp.y
+            );
+
+            // check if player is within vision triangle
+            return result;
+        }
+
+        return false;
+    }
+
+    public void checkIfCanHearPlayer(int dist, Player player, Camera camera) {
+        if (trackingPlayer) return;
+        if (!player.moving()) return;
+
+        PVector temp = new PVector(player.position.x - camera.position.x, player.position.y - camera.position.y);
+        PVector enemyTemp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
+
+        // TODO: currently only track if can hear
+        if (position.dist(player.position) < dist) {
+            if (efficientDDA(enemyTemp, temp, camera)) {
+                // has line of sight of target
+                trackPlayer();
+            } else {
+                stopTracking();
+                // remember where last heard
+                goToLocation(temp);
+            }
+        } else {
+            stopTracking();
+        }
     }
 
     public void trackPlayer() {

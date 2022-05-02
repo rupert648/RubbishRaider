@@ -48,7 +48,7 @@ public abstract class Character extends Movable {
 
     public void wander() {
         // randomly update orientation a little
-        orientation += applet.random(0, PI / 64) - applet.random(0, PI / 64);
+        orientation += applet.random(0, PI / 128) - applet.random(0, PI / 128);
         // Keep in bounds
         if (orientation > PI) orientation -= 2 * PI;
         else if (orientation < -PI) orientation += 2 * PI;
@@ -69,23 +69,23 @@ public abstract class Character extends Movable {
         orientation = atan2(velocity.y, velocity.x);
     }
 
-    public void pursueCharacter(Character c) {
+    public void pursueCharacter(Character c, float scalar) {
         PVector direction = new PVector();
         direction.x = c.position.x - position.x;
         direction.y = c.position.y - position.y;
 
-        seekFlee(c, direction);
+        seekFlee(c, direction, scalar);
     }
 
-    public void fleeCharacter(Character c) {
+    public void fleeCharacter(Character c, float scalar) {
         PVector direction = new PVector();
         direction.x = position.x - c.position.x;
         direction.y = position.y - c.position.y;
 
-        seekFlee(c, direction);
+        seekFlee(c, direction, scalar);
     }
 
-    private void seekFlee(Character c, PVector direction) {
+    private void seekFlee(Character c, PVector direction, float scalar) {
         // predict characters next position
         float distance = direction.mag();
         float speed = velocity.mag();
@@ -99,10 +99,10 @@ public abstract class Character extends Movable {
         // found in gameplay this was very odd
 //        PVector dirToSeek = new PVector(pursueTarget.x - position.x, pursueTarget.y - position.y);
 
-        steeringSeekPoint(direction, 0);
+        steeringSeekPoint(direction, 0, scalar);
     }
 
-    public void steeringSeekPoint(PVector linear, float angular) {
+    public void steeringSeekPoint(PVector linear, float angular, float scalar) {
 
         // if fleeing/seeking don't want them to bounce off the wall, want the 'cornered effect'
         // done by just setting velocity to 0
@@ -112,6 +112,9 @@ public abstract class Character extends Movable {
         if (velocity.y < 0 && level.collidesYUp(this) || velocity.y > 0 && level.collidesYDown(this)) {
             velocity.y = 0;
         }
+
+        PVector newSpeed = position.copy();
+        newSpeed.mult(scalar);
 
         // add velocity afterwards to prevent jittering through walls
         position.add(velocity);
@@ -123,7 +126,7 @@ public abstract class Character extends Movable {
         float distance = linear.mag();
         // If arrived, no acceleration.
         if (distance > TARGET_RADIUS) {
-            float targetSpeed = maxSpeed;
+            float targetSpeed = maxSpeed * scalar;
             if (distance <= SLOW_RADIUS)
                 targetSpeed = maxSpeed * distance / SLOW_RADIUS;
 
@@ -140,9 +143,9 @@ public abstract class Character extends Movable {
             }
 
             velocity.add(accel);
-            if (velocity.mag() > maxSpeed) {
+            if (velocity.mag() > maxSpeed * scalar) {
                 velocity.normalize();
-                velocity.mult(maxSpeed);
+                velocity.mult(maxSpeed * scalar);
             }
         }
 
@@ -154,10 +157,10 @@ public abstract class Character extends Movable {
         else if (rotation < -MAX_ROTATION) rotation = -MAX_ROTATION;
     }
 
-    public void kinematicSeekPoint(PVector linear) {
+    public void kinematicSeekPoint(PVector linear, float scalar) {
         velocity = linear.copy();
         velocity.normalize();
-        velocity.mult(maxSpeed);
+        velocity.mult(maxSpeed * scalar);
 
         float orientationIncrement = PI / 32;
 
@@ -259,5 +262,23 @@ public abstract class Character extends Movable {
             }
         }
         return !bTileFound;
+    }
+
+    public boolean pointTriangleCollision(float x1, float y1, float x2, float y2, float x3, float y3, float pointX, float pointY) {
+        // http://www.jeffreythompson.org/collision-detection/tri-point.php
+        float areaCone = areaTriangle(x1, y1, x2, y2, x3, y3);
+
+        float area1 = areaTriangle(x1, y1, x2, y2, pointX, pointY);
+        float area2 = areaTriangle(x2, y2, x3, y3, pointX, pointY);
+        float area3 = areaTriangle(x1, y1, x3, y3, pointX, pointY);
+
+        float sum = area1 + area2 + area3;
+
+        return sum == areaCone;
+    }
+
+    public float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) {
+        // Herons Formula
+        return Math.abs((x2 - x1) * (y3 - y1) - (x3-x1) * (y2-y1));
     }
 }
