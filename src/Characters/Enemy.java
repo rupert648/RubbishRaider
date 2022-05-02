@@ -30,10 +30,11 @@ public class Enemy extends AStarCharacter {
 
 
     public void integrate(Camera camera, Player player) {
+        trackingPlayer = false;
         if (playerInVision(camera, player)) {
             trackingPlayer = true;
+            lastHeardPosition = null;
         } else {
-            trackingPlayer = false;
             checkIfCanHearPlayer(GameConstants.STEP_SOUND_RADIUS, player, camera);
         }
 
@@ -114,7 +115,7 @@ public class Enemy extends AStarCharacter {
             } else {
                 stopTracking();
                 // remember where last heard
-                goToLocation(temp);
+                goToLocation(player.position);
             }
         } else {
             stopTracking();
