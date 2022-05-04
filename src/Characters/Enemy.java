@@ -17,6 +17,7 @@ public class Enemy extends AStarCharacter {
     Player player;
 
     boolean trackingPlayer;
+    boolean left;
 
     PVector lastHeardPosition;
 

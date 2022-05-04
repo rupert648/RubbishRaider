@@ -15,6 +15,8 @@ import static processing.core.PApplet.*;
 
 public class Camera {
 
+    boolean leftEnemyImage = false;
+
     public PVector position;
     public PVector velocity;
     public float maxSpeed;
@@ -56,19 +58,32 @@ public class Camera {
         current.render(position);
     }
 
-    public void drawEnemy(Enemy enemy) {
+    public void drawEnemy(Enemy enemy, PImage ENEMY_LEFT, PImage ENEMY_RIGHT) {
         float xm = enemy.position.x, ym = enemy.position.y;
 
         drawEnemyCone(enemy);
 
-        enemy.colour();
+        applet.pushMatrix();
+        applet.imageMode(CENTER);
+        applet.translate(xm - position.x, ym - position.y);
+        applet.rotate(enemy.orientation + PI/2); // rotate 45 degrees
 
-        applet.ellipse(xm - position.x, ym - position.y, PLAYER_SIZE_X, PLAYER_SIZE_Y);
-        // Show orientation
-        int newxm = (int) (xm + PLAYER_SIZE_X / 3 * cos(enemy.orientation));
-        int newym = (int) (ym + PLAYER_SIZE_Y / 3 * sin(enemy.orientation));
-        applet.fill(0);
-        applet.ellipse(newxm - position.x, newym - position.y, PLAYER_SIZE_X / 3, PLAYER_SIZE_Y / 3);
+        // swap image every 30 frames
+        if (applet.frameCount % 30 == 0) {
+            leftEnemyImage = !leftEnemyImage;
+        }
+
+        PImage img = leftEnemyImage ? ENEMY_LEFT : ENEMY_RIGHT;
+        applet.image(img, 0, 0);
+
+        applet.popMatrix();
+
+//        applet.ellipse(xm - position.x, ym - position.y, PLAYER_SIZE_X, PLAYER_SIZE_Y);
+//        // Show orientation
+//        int newxm = (int) (xm + PLAYER_SIZE_X / 3 * cos(enemy.orientation));
+//        int newym = (int) (ym + PLAYER_SIZE_Y / 3 * sin(enemy.orientation));
+//        applet.fill(0);
+//        applet.ellipse(newxm - position.x, newym - position.y, PLAYER_SIZE_X / 3, PLAYER_SIZE_Y / 3);
     }
 
     private void drawEnemyCone(Enemy enemy) {

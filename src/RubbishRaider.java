@@ -12,6 +12,8 @@ import java.util.ArrayList;
 public class RubbishRaider extends PApplet {
     // image holder
     PImage PLAYER_IMAGE;
+    PImage ENEMY_LEFT;
+    PImage ENEMY_RIGHT;
 
     // the current level
     public Level currentLevel = new Level(this);
@@ -24,7 +26,7 @@ public class RubbishRaider extends PApplet {
     Player player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 3.0f, 1.0f);
     ArrayList<Enemy> enemies = new ArrayList<>();
 
-//    Enemy enemy = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, 0.8f, 1f, player);
+    // Enemy enemy = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, 0.8f, 1f, player);
 
     // objects
     // TODO: make generated in position
@@ -122,7 +124,7 @@ public class RubbishRaider extends PApplet {
     }
 
     private void renderUpdateEnemy(Enemy enemy) {
-        camera.drawEnemy(enemy);
+        camera.drawEnemy(enemy, ENEMY_LEFT, ENEMY_RIGHT);
 
         enemy.integrate(camera, player);
     }
@@ -196,5 +198,8 @@ public class RubbishRaider extends PApplet {
     public void loadImages() {
         PLAYER_IMAGE = loadImage("./assets/raccoonTop.png");
         PLAYER_IMAGE.resize(100, 100);
+
+        ENEMY_LEFT = loadImage("./assets/enemyLeft.png");
+        ENEMY_RIGHT = loadImage("./assets/enemyRight.png");
     }
 }
