@@ -7,6 +7,7 @@ import Characters.Player;
 import objects.EscapeArea;
 import objects.Goal;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
 
 import static Constants.GameConstants.*;
@@ -86,10 +87,13 @@ public class Camera {
         applet.stroke(0);
     }
 
-    public void drawPlayer(Player player) {
-        applet.fill(0, 0, 200);
-        applet.circle(player.position.x - position.x, player.position.y - position.y, 20);
-        applet.fill(0);
+    public void drawPlayer(Player player, PImage playerImage) {
+        applet.pushMatrix();
+        applet.imageMode(CENTER);
+        applet.translate(player.position.x - position.x, player.position.y - position.y);
+        applet.rotate(player.orientation); // rotate 45 degrees
+        applet.image(playerImage, 0, 0);
+        applet.popMatrix();
 
         player.drawStep(this);
     }

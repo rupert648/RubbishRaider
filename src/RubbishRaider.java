@@ -5,10 +5,14 @@ import Constants.*;
 import objects.EscapeArea;
 import objects.Goal;
 import processing.core.PApplet;
+import processing.core.PImage;
 
 import java.util.ArrayList;
 
 public class RubbishRaider extends PApplet {
+    // image holder
+    PImage PLAYER_IMAGE;
+
     // the current level
     public Level currentLevel = new Level(this);
     // the camera
@@ -38,6 +42,8 @@ public class RubbishRaider extends PApplet {
 
     // initialise screen and particle array
     public void setup() {
+        loadImages();
+
         initEnemies();
         newLevel();
         player.setPathFinder(currentLevel);
@@ -96,7 +102,7 @@ public class RubbishRaider extends PApplet {
 
     private void renderUpdatePlayer() {
         player.integrate(camera);
-        camera.drawPlayer(player);
+        camera.drawPlayer(player, PLAYER_IMAGE);
     }
 
     private void renderUpdateEnemies() {
@@ -185,5 +191,10 @@ public class RubbishRaider extends PApplet {
     public void mouseClicked() {
         // set target pos
         player.setTargetPos(mouseX, mouseY, camera);
+    }
+
+    public void loadImages() {
+        PLAYER_IMAGE = loadImage("./assets/raccoonTop.png");
+        PLAYER_IMAGE.resize(100, 100);
     }
 }
