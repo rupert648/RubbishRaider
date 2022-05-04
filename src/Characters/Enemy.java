@@ -28,14 +28,15 @@ public class Enemy extends AStarCharacter {
         velocity = new PVector(1f, 1f);
     }
 
-
     public void integrate(Camera camera, Player player) {
         trackingPlayer = false;
         if (playerInVision(camera, player)) {
             trackingPlayer = true;
             lastHeardPosition = null;
         } else {
-            checkIfCanHearPlayer(GameConstants.STEP_SOUND_RADIUS, player, camera);
+            int stepRadius = player.sneaking ? GameConstants.STEP_SOUND_RADIUS / 2 : GameConstants.STEP_SOUND_RADIUS;
+
+            checkIfCanHearPlayer(stepRadius, player, camera);
         }
 
         PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);

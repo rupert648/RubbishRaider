@@ -13,6 +13,9 @@ import processing.core.PVector;
 public class Player extends AStarCharacter {
     public PVector targetPos;
 
+    public boolean hasGoal = false;
+    public boolean sneaking = false;
+
     // Step (sound radius)
     int currentStepRadius = 0;
 
@@ -28,6 +31,7 @@ public class Player extends AStarCharacter {
     }
 
     public void integrate(Camera camera) {
+
         applet.fill(255, 255, 0);
         applet.circle(targetPos.x, targetPos.y, 10);
         applet.fill(0);
@@ -40,17 +44,20 @@ public class Player extends AStarCharacter {
             return;
         }
 
+        float multiplier = sneaking ? 0.5f : 1.0f;
+
         // if has line of site of target
         if (efficientDDA(temp, targetPos, camera)) {
             PVector p = new PVector(targetPos.x - temp.x, targetPos.y - temp.y);
-            kinematicSeekPoint(p, 1.0f);
+            kinematicSeekPoint(p,  multiplier);
             return;
         }
 
-        aStar(temp, camera, targetPos);
+        aStar(temp, camera, targetPos, multiplier);
     }
 
-    void aStar(PVector temp, Camera camera, PVector targetPos) {
+    @Override
+    boolean aStar(PVector temp, Camera camera, PVector targetPos, float multiplier) {
         // calculate position in grid square
         int playerCol = (int) position.x / GameConstants.H_GRANULE_SIZE;
         int playerRow = (int) position.y / GameConstants.V_GRANULE_SIZE;
@@ -98,8 +105,9 @@ public class Player extends AStarCharacter {
             nextSquareCoords.sub(camera.position);
 
             PVector p = new PVector(nextSquareCoords.x - temp.x, nextSquareCoords.y - temp.y);
-            kinematicSeekPoint(p, 1.0f);
+            kinematicSeekPoint(p, multiplier);
         }
+        return false;
     }
 
     public void setTargetPos(float x, float y, Camera camera) {
@@ -119,6 +127,12 @@ public class Player extends AStarCharacter {
         pathFound = false;
     }
 
+    public void stop(Camera camera) {
+        velocity.x = 0;
+        velocity.y = 0;
+        targetPos = position.copy();
+        targetPos.sub(camera.position);
+    }
 
     public boolean moving() {
         return velocity.x > 0.5f || velocity.y > 0.5f
@@ -126,10 +140,12 @@ public class Player extends AStarCharacter {
     }
 
     // TODO: make check all enemies
-    public void drawStep(Camera camera, Enemy enemy) {
+    public void drawStep(Camera camera) {
         if (!moving()) return;
 
-        if (currentStepRadius < GameConstants.STEP_SOUND_RADIUS) {
+        float stepRadius = sneaking ? GameConstants.STEP_SOUND_RADIUS / 2 : GameConstants.STEP_SOUND_RADIUS;
+
+        if (currentStepRadius < stepRadius) {
             applet.noFill();
             applet.ellipse(position.x - camera.position.x, position.y - camera.position.y, currentStepRadius, currentStepRadius);
             currentStepRadius += GameConstants.STEP_RADIUS_INCR;

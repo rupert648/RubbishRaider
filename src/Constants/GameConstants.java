@@ -9,8 +9,8 @@ public abstract class GameConstants {
     public static int H_GRANULES = 100;
 
     // and how big are they?
-    public static int V_GRANULE_SIZE = 20;
-    public static int H_GRANULE_SIZE = 20;
+    public static int V_GRANULE_SIZE = 10;
+    public static int H_GRANULE_SIZE = 10;
 
     // PLAYER CONSTANTS
     // player size
@@ -26,4 +26,8 @@ public abstract class GameConstants {
     // enemy constants
     public static float VISION_SIZE = 200.0f;
     public static int CONE_ANGLE = 50;
+
+    // objects
+    public static float OBJECT_PICKUP_RADIUS = 20f;
+    public static float ESCAPE_AREA_SIZE = 100f;
 }

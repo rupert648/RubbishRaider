@@ -4,6 +4,8 @@ import Constants.GameConstants;
 import Level.Level;
 import Characters.Enemy;
 import Characters.Player;
+import objects.EscapeArea;
+import objects.Goal;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -89,7 +91,25 @@ public class Camera {
         applet.circle(player.position.x - position.x, player.position.y - position.y, 20);
         applet.fill(0);
 
-        player.drawStep(this, enemy);
+        player.drawStep(this);
+    }
+
+    public void drawGoal(Goal goal) {
+        applet.fill(0, 200, 0);
+        applet.circle(goal.position.x - position.x, goal.position.y - position.y, 40);
+        applet.fill(0);
+    }
+
+    public void drawEscapeArea(EscapeArea ea) {
+        applet.fill(0, 0, 100);
+        applet.square(ea.position.x - position.x, ea.position.y - position.y, ESCAPE_AREA_SIZE);
+        applet.fill(0);
+    }
+
+    public void drawHud(Goal goal) {
+        if (!goal.pickedUp) return;
+
+        applet.text("Have goal", 10, 10);
     }
 
     public void center(Player player) {
@@ -103,8 +123,6 @@ public class Camera {
 
         position.x = x;
         position.y = y;
-
-
     }
 
     public void movingLeft() {
