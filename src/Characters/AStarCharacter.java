@@ -23,7 +23,7 @@ public abstract class AStarCharacter extends Character {
         super(applet, level, maxSpeed, maxAcceleration, pVector);
     }
 
-    public void setPathFinder() {
+    public void setPathFinder(Level level) {
         pathFinder = new AStarSearch(level, applet);
     }
 

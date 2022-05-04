@@ -6,6 +6,8 @@ import objects.EscapeArea;
 import objects.Goal;
 import processing.core.PApplet;
 
+import java.util.ArrayList;
+
 public class RubbishRaider extends PApplet {
     // the current level
     public Level currentLevel = new Level(this);
@@ -16,7 +18,9 @@ public class RubbishRaider extends PApplet {
 
     // characters
     Player player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 3.0f, 1.0f);
-    Enemy enemy = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, 0.8f, 1f, player);
+    ArrayList<Enemy> enemies = new ArrayList<>();
+
+//    Enemy enemy = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, 0.8f, 1f, player);
 
     // objects
     // TODO: make generated in position
@@ -34,9 +38,23 @@ public class RubbishRaider extends PApplet {
 
     // initialise screen and particle array
     public void setup() {
+        initEnemies();
         newLevel();
-        player.setPathFinder();
-        enemy.setPathFinder();
+        player.setPathFinder(currentLevel);
+
+        // set enemy pathfinders
+        for (Enemy enemy: enemies) {
+            enemy.setPathFinder(currentLevel);
+        }
+    }
+
+    public void initEnemies() {
+        enemies = new ArrayList<>();
+        // TODO: make adjust per level
+        for (int i = 0; i < GameConstants.START_NUMB_ENEMIES; i++) {
+            Enemy enemy = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, 0.8f, 1f, player);
+            enemies.add(enemy);
+        }
     }
 
     // update particles, render.
@@ -78,11 +96,13 @@ public class RubbishRaider extends PApplet {
 
     private void renderUpdatePlayer() {
         player.integrate(camera);
-        camera.drawPlayer(player, enemy);
+        camera.drawPlayer(player);
     }
 
     private void renderUpdateEnemies() {
-        renderUpdateEnemy(enemy);
+        for (Enemy enemy: enemies) {
+            renderUpdateEnemy(enemy);
+        }
     }
 
     private void renderUpdateGoal() {
@@ -121,7 +141,7 @@ public class RubbishRaider extends PApplet {
     public void newLevel() {
         gm = GameState.GENERATING;
 
-        currentLevel.generateLevel();
+        currentLevel.generateLevel(enemies, player, goal);
 
         gm = GameState.PLAYING;
     }

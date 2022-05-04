@@ -1,9 +1,13 @@
 package Level;
 
+import Characters.Enemy;
 import Characters.Movable;
+import Characters.Player;
+import objects.Goal;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+import java.util.ArrayList;
 import java.util.Random;
 import Constants.*;
 
@@ -31,7 +35,7 @@ public class Level {
         map = new TileType[GameConstants.V_GRANULES][GameConstants.H_GRANULES];
     }
 
-    public void generateLevel() {
+    public void generateLevel(ArrayList<Enemy> enemies, Player player, Goal goal) {
         MapGenerationNode start = new MapGenerationNode(new PVector(0, 0), new PVector(GameConstants.H_GRANULES - 1, GameConstants.V_GRANULES - 1));
 
         generationRecur(start, 0);
@@ -39,6 +43,10 @@ public class Level {
         // create rooms
         RoomGenerator rg = new RoomGenerator(map);
         rg.fillRooms(start);
+        rg.placeEnemies(start, enemies);
+        rg.placePlayer(player);
+        rg.placeGoal(goal);
+
         map = rg.getMap();
 
         // ensure edges are walls

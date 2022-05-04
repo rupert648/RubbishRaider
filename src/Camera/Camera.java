@@ -86,7 +86,7 @@ public class Camera {
         applet.stroke(0);
     }
 
-    public void drawPlayer(Player player, Enemy enemy) {
+    public void drawPlayer(Player player) {
         applet.fill(0, 0, 200);
         applet.circle(player.position.x - position.x, player.position.y - position.y, 20);
         applet.fill(0);

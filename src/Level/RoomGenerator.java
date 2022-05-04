@@ -1,9 +1,15 @@
 package Level;
 
+import Characters.Enemy;
+import Characters.Player;
+import Constants.GameConstants;
+import objects.Goal;
 import processing.core.PVector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Stack;
 
 public class RoomGenerator {
 
@@ -31,6 +37,68 @@ public class RoomGenerator {
     public void fillRooms(MapGenerationNode root) {
         int depth = 0;
         treeRecurse(root, depth);
+    }
+
+    public void placeEnemies(MapGenerationNode root, ArrayList<Enemy> enemies) {
+        // get list of rooms
+        ArrayList<MapGenerationNode> leaves = new ArrayList<>();
+
+        Stack<MapGenerationNode> stack = new Stack<>();
+        stack.push(root);
+
+        while (!stack.isEmpty()) {
+            MapGenerationNode node = stack.pop();
+            if (node.leftChild != null)
+                stack.push(node.leftChild);
+            if (node.rightChild != null)
+                stack.push(node.rightChild);
+            if (node.rightChild == null && node.leftChild == null)
+                leaves.add(node);
+        }
+
+        // place enemy in random room in middle
+        for (Enemy enemy: enemies) {
+            Random random = new Random();
+
+            int roomNo = random.nextInt(leaves.size());
+
+            // middle of room
+            MapGenerationNode room = leaves.get(roomNo);
+            float col = room.topLeft.x + ((room.bottomRight.x - room.topLeft.x) / 2);
+            float row = room.topLeft.y + ((room.bottomRight.y - room.topLeft.y) / 2);
+
+            // convert columns into map positions
+            float xPos = col * GameConstants.H_GRANULE_SIZE;
+            float yPos = row * GameConstants.V_GRANULE_SIZE;
+
+            enemy.position.x = xPos;
+            enemy.position.y = yPos;
+        }
+    }
+
+    void placePlayer(Player player) {
+        // for now, place in the top left
+        int col = 1;
+        int row = 1;
+
+        // convert columns into map positions
+        float xPos = col * GameConstants.H_GRANULE_SIZE;
+        float yPos = row * GameConstants.V_GRANULE_SIZE;
+
+        player.position.x = xPos;
+        player.position.y = yPos;
+    }
+
+    void placeGoal(Goal goal) {
+        int col = map[0].length - 2;
+        int row = map.length - 2;
+
+        // convert columns into map positions
+        float xPos = col * GameConstants.H_GRANULE_SIZE;
+        float yPos = row * GameConstants.V_GRANULE_SIZE;
+
+        goal.position.x = xPos;
+        goal.position.y = yPos;
     }
 
     private void treeRecurse(MapGenerationNode current, int depth) {
