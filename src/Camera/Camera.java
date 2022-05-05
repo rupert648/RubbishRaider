@@ -58,8 +58,15 @@ public class Camera {
         position.add(velocity);
     }
 
-    public void render(Level current, PImage KITCHEN_TILE, PImage BATHROOM_TILE, PImage BEDROOM_TILE, PImage LIVING_ROOM_TILE) {
-        current.render(position, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE);
+    public void render(
+            Level current,
+            PImage KITCHEN_TILE,
+            PImage BATHROOM_TILE,
+            PImage BEDROOM_TILE,
+            PImage LIVING_ROOM_TILE,
+            PImage WALL_TILE
+    ) {
+        current.render(position, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE, WALL_TILE);
     }
 
     public void drawEnemy(Enemy enemy, PImage ENEMY_LEFT, PImage ENEMY_RIGHT) {

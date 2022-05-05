@@ -39,6 +39,8 @@ public class Player extends AStarCharacter {
     public void integrate() {
         float multiplier = sneaking ? 0.5f : 1.0f;
 
+//        TODO: WALL COLLISION!
+
         // only update orientation if moved
         if (movingLeft) {
             velocity.x = -1 * maxSpeed * multiplier;
@@ -54,6 +56,16 @@ public class Player extends AStarCharacter {
             velocity.y = maxSpeed * multiplier;
             orientation = atan2(velocity.y, velocity.x);
         } else velocity.y = 0;
+
+        // Deal with collisions by stopping dead. Bit crude.
+        // Horizontal collisions
+        if ((velocity.x < 0 && level.collidesXLeft(this)) ||
+                (velocity.x > 0 && level.collidesXRight(this))) {
+            velocity.x = 0;
+        } else if ((velocity.y < 0 && level.collidesYUp(this)) ||
+                (velocity.y > 0 && level.collidesYDown(this))) {
+            velocity.y = 0;
+        }
 
         // update orientation
         position.add(velocity);

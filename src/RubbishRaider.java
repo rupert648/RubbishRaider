@@ -32,6 +32,7 @@ public class RubbishRaider extends PApplet {
     PImage KITCHEN_TILE;
     PImage BEDROOM_TILE;
     PImage LIVING_ROOM_TILE;
+    PImage WALL_TILE;
 
     // gamestate options
     GameState gm = GameState.GENERATING;
@@ -161,7 +162,7 @@ public class RubbishRaider extends PApplet {
         background(0, 170, 0);
 
         camera.integrate(player);
-        camera.render(currentLevel, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE);
+        camera.render(currentLevel, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE, WALL_TILE);
 
         renderUpdateGoal();
         renderUpdateEscapeArea();
@@ -285,10 +286,11 @@ public class RubbishRaider extends PApplet {
         KITCHEN_TILE = loadImage("./assets/kitchenTile.png");
         BEDROOM_TILE = loadImage("./assets/bedroomTile.png");
         LIVING_ROOM_TILE = loadImage("./assets/livingRoomTile.png");
+        WALL_TILE = loadImage("./assets/wallTile.png");
         BATHROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         KITCHEN_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         BEDROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         LIVING_ROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
-
+        WALL_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
     }
 }

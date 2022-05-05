@@ -307,7 +307,8 @@ public class Level {
             PImage KITCHEN_TILE,
             PImage BATHROOM_TILE,
             PImage BEDROOM_TILE,
-            PImage LIVING_ROOM_TILE
+            PImage LIVING_ROOM_TILE,
+            PImage WALL_TILE
     ) {
         app.fill(0);
         for (int row = 0; row < GameConstants.V_GRANULES; row++) {
@@ -323,6 +324,7 @@ public class Level {
                     case BATHROOM -> app.image(BATHROOM_TILE, xPos, yPos);
                     case BEDROOM -> app.image(BEDROOM_TILE, xPos, yPos);
                     case LIVING_ROOM -> app.image(LIVING_ROOM_TILE, xPos, yPos);
+                    case WALL -> app.image(WALL_TILE, xPos, yPos);
                     default -> {
                         setColour(tile);
 
