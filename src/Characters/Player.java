@@ -72,15 +72,6 @@ public class Player extends AStarCharacter {
             currentAstarPathIndex = 0;
         } else if (thePath != null && currentAstarPathIndex < thePath.size()) {
 
-            // draw path
-            for (AStarNode node : thePath) {
-                // get positions
-                int x = node.getCol() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE / 2;
-                int y = node.getRow() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE / 2;
-
-                applet.circle(x - camera.position.x, y - camera.position.y, 2);
-            }
-
             // iterate from this and find last path that can be directly seen.
             for (int i = currentAstarPathIndex; i < thePath.size(); i++) {
                 AStarNode current = thePath.get(i);

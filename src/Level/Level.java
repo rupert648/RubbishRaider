@@ -3,15 +3,22 @@ package Level;
 import Characters.Enemy;
 import Characters.Movable;
 import Characters.Player;
+import objects.Bed;
 import objects.Goal;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.Random;
+
 import Constants.*;
 
 public class Level {
+    final int NUMB_OF_ATTEMPTS = 100;
+    final int ROOM_SIZE = 15;
+    // object arrays following init
+    public ArrayList<Bed> beds = new ArrayList<Bed>();
     // room colours
     PVector bathroom = new PVector(173, 216, 230);
     PVector generic = new PVector(220, 220, 220);
@@ -20,12 +27,9 @@ public class Level {
     PVector livingRoom = new PVector(0, 255, 0);
     PVector wall = new PVector(0, 0, 0);
     PVector defaultCol = new PVector(255, 0, 0);
-    PVector bedDuvet = new PVector(0, 0,220);
+    PVector bedDuvet = new PVector(0, 0, 220);
     PVector bedPillow = new PVector(255, 255, 255);
     PVector cabinet = new PVector(165, 42, 42);
-
-    final int NUMB_OF_ATTEMPTS = 100;
-    final int ROOM_SIZE = 15;
     PApplet app;
     private TileType[][] map;
 
@@ -47,7 +51,9 @@ public class Level {
         rg.placePlayer(player);
         rg.placeGoal(goal);
 
+        // get updated values
         map = rg.getMap();
+        beds = rg.beds;
 
         // ensure edges are walls
         for (int i = 0; i < GameConstants.H_GRANULES; i++) {
@@ -296,19 +302,34 @@ public class Level {
         }
     }
 
-    public void render(PVector cameraPosition) {
+    public void render(
+            PVector cameraPosition,
+            PImage KITCHEN_TILE,
+            PImage BATHROOM_TILE,
+            PImage BEDROOM_TILE,
+            PImage LIVING_ROOM_TILE
+    ) {
         app.fill(0);
         for (int row = 0; row < GameConstants.V_GRANULES; row++) {
             for (int col = 0; col < GameConstants.H_GRANULES; col++) {
 
-                setColour(map[row][col]);
+                TileType tile = map[row][col];
 
                 float xPos = col * GameConstants.H_GRANULE_SIZE - cameraPosition.x;
                 float yPos = row * GameConstants.V_GRANULE_SIZE - cameraPosition.y;
 
-                app.rect(xPos, yPos,
-                        GameConstants.H_GRANULE_SIZE, GameConstants.V_GRANULE_SIZE);
+                switch (tile) {
+                    case KITCHEN -> app.image(KITCHEN_TILE, xPos, yPos);
+                    case BATHROOM -> app.image(BATHROOM_TILE, xPos, yPos);
+                    case BEDROOM -> app.image(BEDROOM_TILE, xPos, yPos);
+                    case LIVING_ROOM -> app.image(LIVING_ROOM_TILE, xPos, yPos);
+                    default -> {
+                        setColour(tile);
 
+                        app.rect(xPos, yPos,
+                                GameConstants.H_GRANULE_SIZE, GameConstants.V_GRANULE_SIZE);
+                    }
+                }
             }
         }
         app.fill(0);

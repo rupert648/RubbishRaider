@@ -29,7 +29,7 @@ public class Enemy extends AStarCharacter {
         velocity = new PVector(1f, 1f);
     }
 
-    public void integrate(Camera camera, Player player) {
+    public boolean integrate(Camera camera, Player player) {
         trackingPlayer = false;
         if (playerInVision(camera, player)) {
             trackingPlayer = true;
@@ -48,13 +48,15 @@ public class Enemy extends AStarCharacter {
 
             // set orientation
             orientation = velocity.heading();
-            return;
+
+            // check for collision only if tracking player, prevents calling every frame
+            return checkIfCaughtPlayer(player);
         }
 
         if (lastHeardPosition != null) {
             if (position.dist(lastHeardPosition) < GameConstants.H_GRANULE_SIZE / 4.0f) {
                 lastHeardPosition = null;
-                return;
+                return false;
             }
 
             if (aStar(temp, camera, lastHeardPosition, 1.5f)) {
@@ -63,10 +65,17 @@ public class Enemy extends AStarCharacter {
 
             // set orientation
             orientation = velocity.heading();
-            return;
+            return false;
         }
 
         wander();
+        return false;
+    }
+
+    public boolean checkIfCaughtPlayer(Player player) {
+        float dist = player.position.dist(position);
+
+        return dist < GameConstants.CATCH_RADIUS;
     }
 
     public boolean playerInVision(Camera camera, Player player) {

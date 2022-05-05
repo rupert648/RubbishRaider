@@ -3,6 +3,7 @@ package Level;
 import Characters.Enemy;
 import Characters.Player;
 import Constants.GameConstants;
+import objects.Bed;
 import objects.Goal;
 import processing.core.PVector;
 
@@ -11,19 +12,59 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Stack;
 
+import static processing.core.PConstants.PI;
+
 public class RoomGenerator {
 
+    // object arrays
+    public ArrayList<Bed> beds = new ArrayList<Bed>();
     // todo: need to maintain this, could tidy up data structures to better represent furniture tiles
     TileType[] furnitureTiles = {
             TileType.BED_DUVET,
             TileType.BED_PILLOW,
             TileType.CABINET
     };
-
     private TileType[][] map;
 
     public RoomGenerator(TileType[][] map) {
         this.map = map;
+    }
+
+    private static TileType getRoomType(int depth) {
+        // fiddle with this to change size of rooms/what room is picked
+
+        switch (depth) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4: {
+                Random rn = new Random();
+                int val = rn.nextInt(4);
+                switch (val) {
+                    case 0:
+                        return TileType.LIVING_ROOM;
+                    case 1:
+                        return TileType.KITCHEN;
+                    case 2:
+                        return TileType.BEDROOM;
+                }
+            }
+            default: {
+                Random rn = new Random();
+                int val = rn.nextInt(4);
+                switch (val) {
+                    case 0:
+                        return TileType.BEDROOM;
+                    case 1:
+                        return TileType.BATHROOM;
+                    case 2:
+                        return TileType.GENERIC;
+                }
+            }
+        }
+
+        return TileType.GENERIC;
     }
 
     public TileType[][] getMap() {
@@ -57,7 +98,7 @@ public class RoomGenerator {
         }
 
         // place enemy in random room in middle
-        for (Enemy enemy: enemies) {
+        for (Enemy enemy : enemies) {
             Random random = new Random();
 
             int roomNo = random.nextInt(leaves.size());
@@ -78,15 +119,11 @@ public class RoomGenerator {
 
     void placePlayer(Player player) {
         // for now, place in the top left
-        int col = 1;
-        int row = 1;
 
-        // convert columns into map positions
-        float xPos = col * GameConstants.H_GRANULE_SIZE;
-        float yPos = row * GameConstants.V_GRANULE_SIZE;
-
-        player.position.x = xPos;
-        player.position.y = yPos;
+        player.position.x = GameConstants.MY_WIDTH / 5;
+        player.position.y = GameConstants.MY_HEIGHT / 5;
+        player.targetPos.x = GameConstants.MY_WIDTH / 5;
+        player.targetPos.y = GameConstants.MY_HEIGHT / 5;
     }
 
     void placeGoal(Goal goal) {
@@ -122,8 +159,8 @@ public class RoomGenerator {
         PVector topLeft = current.topLeft;
         PVector bottomRight = current.bottomRight;
 
-        for (int i = (int) (topLeft.x ); i < bottomRight.x ; i++) {
-            for (int j = (int) (topLeft.y); j < bottomRight.y ; j++) {
+        for (int i = (int) (topLeft.x); i < bottomRight.x; i++) {
+            for (int j = (int) (topLeft.y); j < bottomRight.y; j++) {
                 map[j][i] = roomType;
             }
         }
@@ -133,69 +170,28 @@ public class RoomGenerator {
 
     private void addFurniture(MapGenerationNode current, TileType roomType) {
         if (roomType == TileType.BEDROOM) {
-
-            Furniture bed = Furniture.bed();
-            Furniture cupboard = Furniture.cupboard();
-            // try and place in the top left of room
             Random rn = new Random();
 
-            // TODO: ensure that furniture doesn't overlap
+            Bed bed = new Bed();
 
-            // place bed
             int orientation = rn.nextInt(4);
             placeFurniture(current, bed, orientation);
 
-            // place cupboard
-            orientation = rn.nextInt(4);
-            placeFurniture(current, cupboard, orientation);
-
+            beds.add(bed);
         }
     }
 
-    private static TileType getRoomType(int depth) {
-        // fiddle with this to change size of rooms/what room is picked
-
-        switch (depth) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4: {
-                Random rn = new Random();
-                int val = rn.nextInt(4);
-                switch (val) {
-                    case 0: return TileType.LIVING_ROOM;
-                    case 1: return TileType.KITCHEN;
-                    case 2: return TileType.BEDROOM;
-                }
-            }
-            default: {
-                Random rn = new Random();
-                int val = rn.nextInt(4);
-                switch (val) {
-                    case 0: return TileType.BEDROOM;
-                    case 1: return TileType.BATHROOM;
-                    case 2: return TileType.GENERIC;
-                }
-            }
-        }
-
-        return TileType.GENERIC;
-    }
-
-    public void placeFurniture(MapGenerationNode current, Furniture furniture, int orientation) {
+    public void placeFurniture(MapGenerationNode current, Bed bed, int orientation) {
         switch (orientation) {
-            case 0 -> placeFurnitureNorth(current, furniture);
-            case 1 -> placeFurnitureSouth(current, furniture);
-            case 2 -> placeFurnitureEast(current, furniture);
-            case 3 -> placeFurnitureWest(current, furniture);
+            case 0 -> placeFurnitureNorth(current, bed);
+            case 1 -> placeFurnitureSouth(current, bed);
+            case 2 -> placeFurnitureEast(current, bed);
+            case 3 -> placeFurnitureWest(current, bed);
         }
     }
 
-    private void placeFurnitureWest(MapGenerationNode current, Furniture f) {
+    private void placeFurnitureWest(MapGenerationNode current, Bed bed) {
         Random rn = new Random();
-
-        TileType[][] tileArray = f.tileArray;
 
         // random xPos
         int startX = (int) current.topLeft.x;
@@ -205,130 +201,91 @@ public class RoomGenerator {
         boolean isValid = false;
         while (!isValid) {
             // random Y
-            startY = (int) current.topLeft.y +  rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - tileArray.length));
+            startY = (int) current.topLeft.y + rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - (GameConstants.BED_HEIGHT / GameConstants.H_GRANULE_SIZE)));
 
             // check not next to door
-            if (startX - 1 >= 0 && map[startY][startX-1] == TileType.EMPTY) {
+            if (startX - 1 >= 0 && map[startY][startX - 1] == TileType.EMPTY) {
                 continue;
             }
 
             isValid = true;
-
-            // iterate furniture array
-            outerLoop:
-            for (int i = 0; i < tileArray.length; i++) {
-                for (int j = 0; j < tileArray[0].length; j++ ) {
-                    if (isFurnitureTile(map[startY + j][startX + i])) {
-                        isValid = false;
-                        break outerLoop;
-                    }
-                }
-            }
         }
 
-        // place tiles
-        for (int i = 0; i < tileArray.length; i++) {
-            for (int j = 0; j < tileArray[0].length; j++ ) {
-                TileType furnitureTile = tileArray[i][j];
-                // map[row][column]
-                map[startY + j][startX + i] = furnitureTile;
-            }
-        }
+        int xPos = startX * GameConstants.V_GRANULE_SIZE;
+        int yPos = startY * GameConstants.H_GRANULE_SIZE;
+
+        // need to subtract bed width due to image translation when rendering
+        bed.position.x = xPos;
+        bed.position.y = yPos + GameConstants.BED_WIDTH;
+
+        // set orientation
+        bed.orientation = 3 * PI / 2;
     }
 
-    private void placeFurnitureEast(MapGenerationNode current, Furniture f) {
+    private void placeFurnitureEast(MapGenerationNode current, Bed bed) {
         Random rn = new Random();
 
-        TileType[][] tileArray = f.tileArray;
-
         // random xPos
-        int startX = (int) current.bottomRight.x - tileArray[0].length;
+        int startX = (int) current.bottomRight.x - (GameConstants.BED_WIDTH / GameConstants.V_GRANULE_SIZE);
         int startY = -1;
 
         // iterate until find startY which doesn't overlap other furniture
         boolean isValid = false;
         while (!isValid) {
             // random Y
-            startY = (int) current.topLeft.y +  rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - tileArray.length));
+            startY = (int) current.topLeft.y + rn.nextInt((int) (current.bottomRight.y - current.topLeft.y - (GameConstants.BED_HEIGHT / GameConstants.H_GRANULE_SIZE)));
 
             // check not next to door
-            if (startX + 1 < map[0].length && map[startY][startX+1] == TileType.EMPTY) {
+            if (startX + 1 < map[0].length && map[startY][startX + 1] == TileType.EMPTY) {
                 continue;
             }
 
             isValid = true;
-
-            // iterate furniture array
-            outerLoop:
-            for (int i = 0; i < tileArray.length; i++) {
-                for (int j = 0; j < tileArray[0].length; j++ ) {
-                    if (isFurnitureTile(map[startY + j][startX + (tileArray[0].length - 1 - i)])) {
-                        isValid = false;
-                        break outerLoop;
-                    }
-                }
-            }
         }
 
-        // iterate furniture array
-        for (int i = 0; i < tileArray.length; i++) {
-            for (int j = 0; j < tileArray[0].length; j++ ) {
-                TileType furnitureTile = tileArray[i][j];
-                // map[row][column]
-                map[startY + j][startX + (tileArray[0].length - 1 - i)] = furnitureTile;
-            }
-        }
+        int xPos = startX * GameConstants.V_GRANULE_SIZE;
+        int yPos = startY * GameConstants.H_GRANULE_SIZE;
+
+        // need to add BED_WIDTH due to image translation later
+        bed.position.x = xPos + GameConstants.BED_WIDTH;
+        bed.position.y = yPos;
+
+        // set orientation
+        bed.orientation = PI / 2;
     }
 
-    private void placeFurnitureSouth(MapGenerationNode current, Furniture f) {
+    private void placeFurnitureSouth(MapGenerationNode current, Bed bed) {
         Random rn = new Random();
 
-        TileType[][] tileArray = f.tileArray;
-
-        // random xPos
-
-        int startY = (int) current.bottomRight.y - tileArray.length;
+        int startY = (int) current.bottomRight.y - (GameConstants.BED_HEIGHT / GameConstants.H_GRANULE_SIZE);
         int startX = -1;
 
         // iterate until find startY which doesn't overlap other furniture
         boolean isValid = false;
         while (!isValid) {
             // random Y
-            startX = (int) current.topLeft.x +  rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - tileArray[0].length));
+            startX = (int) current.topLeft.x + rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - (GameConstants.BED_WIDTH / GameConstants.V_GRANULE_SIZE)));
 
             // check not next to door
-            // TODO: check this for every tile?
-            if (startY + 1 < map.length && map[startY+1][startX] == TileType.EMPTY) {
+            if (startY + 1 < map.length && map[startY + 1][startX] == TileType.EMPTY) {
                 continue;
             }
 
             isValid = true;
-
-            // iterate furniture array
-            outerLoop:
-            for (int i = tileArray.length - 1; i >= 0; i--) {
-                for (int j = 0; j < tileArray[0].length; j++ ) {
-                    if (isFurnitureTile(map[startY + (tileArray.length - 1 - i)][startX + j])) {
-                        isValid = false;
-                        break outerLoop;
-                    }
-                }
-            }
         }
 
-        // iterate furniture array
-        for (int i = tileArray.length - 1; i >= 0; i--) {
-            for (int j = 0; j < tileArray[0].length; j++ ) {
-                TileType furnitureTile = tileArray[i][j];
-                // map[row][column]
-                map[startY + (tileArray.length - 1 - i)][startX + j] = furnitureTile;
-            }
-        }
+        int xPos = startX * GameConstants.V_GRANULE_SIZE;
+        int yPos = startY * GameConstants.H_GRANULE_SIZE;
+
+        bed.position.x = xPos;
+        bed.position.y = yPos + GameConstants.BED_HEIGHT;
+
+        // set orientation
+        bed.orientation = PI;
     }
 
-    private void placeFurnitureNorth(MapGenerationNode current, Furniture f) {
+    private void placeFurnitureNorth(MapGenerationNode current, Bed bed) {
         Random rn = new Random();
-        TileType[][] tileArray = f.tileArray;
 
         // random xPos
         int startY = (int) current.topLeft.y;
@@ -338,35 +295,24 @@ public class RoomGenerator {
         boolean isValid = false;
         while (!isValid) {
             // random Y
-            startX = (int) current.topLeft.x +  rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - tileArray[0].length));
+            startX = (int) current.topLeft.x + rn.nextInt((int) (current.bottomRight.x - current.topLeft.x - (GameConstants.BED_WIDTH / GameConstants.V_GRANULE_SIZE)));
 
             // check not next to door
-            if (startY - 1 >= 0 && map[startY-1][startX] == TileType.EMPTY) {
+            if (startY - 1 >= 0 && map[startY - 1][startX] == TileType.EMPTY) {
                 continue;
             }
 
             isValid = true;
-
-            // iterate furniture array
-            outerLoop:
-            for (int i = 0; i < tileArray.length; i++) {
-                for (int j = 0; j < tileArray[0].length; j++ ) {
-                    if (isFurnitureTile(map[startY + i][startX + j])) {
-                        isValid = false;
-                        break outerLoop;
-                    }
-                }
-            }
         }
 
-        // iterate furniture array
-        for (int i = 0; i < tileArray.length; i++) {
-            for (int j = 0; j < tileArray[0].length; j++ ) {
-                TileType furnitureTile = tileArray[i][j];
-                // map[row][column]
-                map[startY + i][startX + j] = furnitureTile;
-            }
-        }
+        int xPos = startX * GameConstants.V_GRANULE_SIZE;
+        int yPos = startY * GameConstants.H_GRANULE_SIZE;
+
+        bed.position.x = xPos;
+        bed.position.y = yPos;
+
+        // set orientation
+        bed.orientation = 0;
     }
 
     private boolean isFurnitureTile(TileType t) {

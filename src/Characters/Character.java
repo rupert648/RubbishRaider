@@ -204,7 +204,6 @@ public abstract class Character extends Movable {
     public boolean efficientDDA(PVector start, PVector end, Camera camera) {
         float dx = end.x - start.x;
         float dy = end.y - start.y;
-        applet.line(start.x, start.y, end.x, end.y);
         PVector rayDir = new PVector(dx, dy);
 
         // more optimal step size
@@ -251,10 +250,6 @@ public abstract class Character extends Movable {
                 vRayLength1D.y += unitStepSize.y;
             }
 
-            applet.stroke(255, 0, 0);
-            applet.circle(vMapCheck.x, vMapCheck.y, 1);
-            applet.stroke(0);
-
             int row = (int) (vMapCheck.y + camera.position.y) / GameConstants.V_GRANULE_SIZE;
             int col = (int) (vMapCheck.x + camera.position.x) / GameConstants.H_GRANULE_SIZE;
             if (level.getMap()[row][col] == TileType.WALL) {
@@ -279,6 +274,6 @@ public abstract class Character extends Movable {
 
     public float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) {
         // Herons Formula
-        return Math.abs((x2 - x1) * (y3 - y1) - (x3-x1) * (y2-y1));
+        return Math.abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1));
     }
 }

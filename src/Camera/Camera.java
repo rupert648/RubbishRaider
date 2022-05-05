@@ -4,6 +4,7 @@ import Constants.GameConstants;
 import Level.Level;
 import Characters.Enemy;
 import Characters.Player;
+import objects.Bed;
 import objects.EscapeArea;
 import objects.Goal;
 import processing.core.PApplet;
@@ -15,13 +16,11 @@ import static processing.core.PApplet.*;
 
 public class Camera {
 
-    boolean leftEnemyImage = false;
-
     public PVector position;
     public PVector velocity;
     public float maxSpeed;
     public PApplet applet;
-
+    boolean leftEnemyImage = false;
     // moving directions
     boolean movingLeft;
     boolean movingRight;
@@ -54,8 +53,8 @@ public class Camera {
         player.targetPos.sub(velocity);
     }
 
-    public void render(Level current) {
-        current.render(position);
+    public void render(Level current, PImage KITCHEN_TILE, PImage BATHROOM_TILE, PImage BEDROOM_TILE, PImage LIVING_ROOM_TILE) {
+        current.render(position, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE);
     }
 
     public void drawEnemy(Enemy enemy, PImage ENEMY_LEFT, PImage ENEMY_RIGHT) {
@@ -66,7 +65,7 @@ public class Camera {
         applet.pushMatrix();
         applet.imageMode(CENTER);
         applet.translate(xm - position.x, ym - position.y);
-        applet.rotate(enemy.orientation + PI/2); // rotate 45 degrees
+        applet.rotate(enemy.orientation + PI / 2); // rotate 45 degrees
 
         // swap image every 30 frames
         if (applet.frameCount % 30 == 0) {
@@ -113,22 +112,33 @@ public class Camera {
         player.drawStep(this);
     }
 
-    public void drawGoal(Goal goal) {
-        applet.fill(0, 200, 0);
-        applet.circle(goal.position.x - position.x, goal.position.y - position.y, 40);
-        applet.fill(0);
+    public void drawGoal(Goal goal, PImage image) {
+        applet.imageMode(CENTER);
+        applet.image(image, goal.position.x-position.x, goal.position.y - position.y);
+        applet.imageMode(CORNER);
     }
 
-    public void drawEscapeArea(EscapeArea ea) {
-        applet.fill(0, 0, 100);
-        applet.square(ea.position.x - position.x, ea.position.y - position.y, ESCAPE_AREA_SIZE);
-        applet.fill(0);
+    public void drawEscapeArea(EscapeArea ea, PImage image) {
+
+        applet.image(image, ea.position.x - position.x, ea.position.y - position.y);
+    }
+
+    public void drawBed(Bed bed, PImage bedImage) {
+        applet.circle(bed.position.x - position.x, bed.position.y - position.y, 10);
+
+        applet.pushMatrix();
+        applet.imageMode(CORNER);
+        applet.translate(bed.position.x - position.x, bed.position.y - position.y);
+        applet.rotate(bed.orientation);
+
+        applet.image(bedImage, 0, 0, BED_WIDTH, BED_HEIGHT);
+        applet.popMatrix();
     }
 
     public void drawHud(Goal goal) {
         if (!goal.pickedUp) return;
 
-        applet.text("Have goal", 10, 10);
+        applet.text("Have goal", 10, 30);
     }
 
     public void center(Player player) {
