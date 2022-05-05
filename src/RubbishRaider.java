@@ -8,7 +8,6 @@ import objects.Goal;
 import processing.core.PApplet;
 import processing.core.PImage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class RubbishRaider extends PApplet {
@@ -46,7 +45,7 @@ public class RubbishRaider extends PApplet {
     // objects
     Goal goal = new Goal(GameConstants.MY_WIDTH / 2 + 100, GameConstants.MY_HEIGHT / 2 + 100);
     EscapeArea escapeArea = new EscapeArea(GameConstants.MY_WIDTH / 5, GameConstants.MY_HEIGHT / 5);
-    ArrayList<Bed> beds = new ArrayList<Bed>();
+    ArrayList<Bed> beds = new ArrayList<>();
 
     public static void main(String[] args) {
         RubbishRaider main = new RubbishRaider();
@@ -98,7 +97,7 @@ public class RubbishRaider extends PApplet {
 
     private void won() {
         background(0);
-        text("YOU WON", GameConstants.MY_WIDTH / 3, GameConstants.MY_HEIGHT / 3);
+        text("YOU WON", (float) GameConstants.MY_WIDTH / 3, (float) GameConstants.MY_HEIGHT / 3);
     }
 
     private void menu() {
@@ -126,7 +125,7 @@ public class RubbishRaider extends PApplet {
 
     private void generating() {
         image(TRANSPARENT, 0 ,0);
-        text("LOADING...", GameConstants.MY_WIDTH / 2 - 20, GameConstants.MY_HEIGHT / 2 - 20);
+        text("LOADING...", (float) GameConstants.MY_WIDTH / 2 - 20, (float) GameConstants.MY_HEIGHT / 2 - 20);
     }
 
     private void startingLevelScreen() {
@@ -145,7 +144,7 @@ public class RubbishRaider extends PApplet {
         fill(255, 0, 0);
         stroke(0);
         textSize(50);
-        text("LEVEL  " + level, GameConstants.MY_WIDTH / 2 - 40, GameConstants.MY_HEIGHT / 2);
+        text("LEVEL  " + level, (float) GameConstants.MY_WIDTH / 2 - 40, (float) GameConstants.MY_HEIGHT / 2);
         fill(0);
         noStroke();
         noTint();
