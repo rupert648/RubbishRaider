@@ -140,6 +140,7 @@ public class RubbishRaider extends PApplet {
         }
 
         tint(255, tintVal);
+        imageMode(CORNER);
         image(TRANSPARENT, 0, 0);
         fill(255, 0, 0);
         stroke(0);
@@ -172,7 +173,7 @@ public class RubbishRaider extends PApplet {
     }
 
     private void renderUpdatePlayer() {
-        player.integrate(camera);
+        player.integrate();
         camera.drawPlayer(player, PLAYER_IMAGE);
     }
 
@@ -231,44 +232,36 @@ public class RubbishRaider extends PApplet {
     }
 
     public void keyPressed() {
-        if (key == CODED && keyCode == SHIFT) {
-            player.sneaking = true;
-            return;
+        if (key == CODED) {
+            // camera
+            if (keyCode == UP) camera.movingUp();
+            if (keyCode == RIGHT) camera.movingRight();
+            if (keyCode == LEFT) camera.movingLeft();
+            if (keyCode == DOWN) camera.movingDown();
+
+            if (keyCode == SHIFT) player.sneaking = !player.sneaking;
         }
 
-        switch (key) {
-            case 'a' -> camera.movingLeft();
-            case 'd' -> camera.movingRight();
-            case 'w' -> camera.movingUp();
-            case 's' -> camera.movingDown();
-            case 'c' -> player.stop(camera);
-            case ' ' -> camera.center(player);
-        }
+        if (key == 'w') player.movingUp();
+        if (key == 'a') player.movingLeft();
+        if (key == 's') player.movingDown();
+        if (key == 'd') player.movingRight();
+        if (key == 'c') camera.followingPlayer = !camera.followingPlayer;
+        if (key == ' ') camera.center(player);
     }
 
     public void keyReleased() {
-        if (key == CODED && keyCode == SHIFT) {
-            player.sneaking = false;
-            return;
+        if (key == CODED) {
+            if (keyCode == UP) camera.stopMovingUp();
+            if (keyCode == RIGHT) camera.stopMovingRight();
+            if (keyCode == LEFT) camera.stopMovingLeft();
+            if (keyCode == DOWN) camera.stopMovingDown();
         }
 
-        if (key == 'a') {
-            camera.stopMovingLeft();
-        }
-        if (key == 'd') {
-            camera.stopMovingRight();
-        }
-        if (key == 'w') {
-            camera.stopMovingUp();
-        }
-        if (key == 's') {
-            camera.stopMovingDown();
-        }
-    }
-
-    public void mouseClicked() {
-        // set target pos
-        player.setTargetPos(mouseX, mouseY, camera);
+        if (key == 'w') player.stopMovingUp();
+        if (key == 'a') player.stopMovingLeft();
+        if (key == 's') player.stopMovingDown();
+        if (key == 'd') player.stopMovingRight();
     }
 
     public void loadImages() {

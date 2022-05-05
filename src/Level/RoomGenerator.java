@@ -122,8 +122,6 @@ public class RoomGenerator {
 
         player.position.x = GameConstants.MY_WIDTH / 5;
         player.position.y = GameConstants.MY_HEIGHT / 5;
-        player.targetPos.x = GameConstants.MY_WIDTH / 5;
-        player.targetPos.y = GameConstants.MY_HEIGHT / 5;
     }
 
     void placeGoal(Goal goal) {

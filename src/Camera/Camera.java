@@ -21,6 +21,9 @@ public class Camera {
     public float maxSpeed;
     public PApplet applet;
     boolean leftEnemyImage = false;
+
+    public boolean followingPlayer = true;
+
     // moving directions
     boolean movingLeft;
     boolean movingRight;
@@ -36,6 +39,11 @@ public class Camera {
     }
 
     public void integrate(Player player) {
+        if (followingPlayer) {
+            center(player);
+            return;
+        }
+
         if (movingLeft) {
             velocity.x = -1 * maxSpeed;
         } else if (movingRight) {
@@ -48,9 +56,6 @@ public class Camera {
         } else velocity.y = 0;
 
         position.add(velocity);
-
-        // update targetPos
-        player.targetPos.sub(velocity);
     }
 
     public void render(Level current, PImage KITCHEN_TILE, PImage BATHROOM_TILE, PImage BEDROOM_TILE, PImage LIVING_ROOM_TILE) {
@@ -105,6 +110,7 @@ public class Camera {
         applet.pushMatrix();
         applet.imageMode(CENTER);
         applet.translate(player.position.x - position.x, player.position.y - position.y);
+        float orientation = atan2(player.velocity.y, player.velocity.x);
         applet.rotate(player.orientation); // rotate 45 degrees
         applet.image(playerImage, 0, 0);
         applet.popMatrix();
@@ -145,10 +151,6 @@ public class Camera {
         float x, y;
         x = player.position.x - MY_WIDTH / 2;
         y = player.position.y - MY_HEIGHT / 2;
-
-        // update target pos for player
-        player.targetPos.x += position.x - x;
-        player.targetPos.y += position.y - y;
 
         position.x = x;
         position.y = y;
