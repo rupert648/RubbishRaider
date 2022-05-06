@@ -71,7 +71,7 @@ public class RubbishRaider extends PApplet {
     }
 
     public void initPlayer() {
-        player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 10.0f, 1.0f);
+        player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 3.0f, 1.0f);
     }
 
     public void initGoal() {
@@ -313,7 +313,7 @@ public class RubbishRaider extends PApplet {
         if (key == 's') player.movingDown();
         if (key == 'd') player.movingRight();
         if (key == 'c') camera.followingPlayer = !camera.followingPlayer;
-        if (key == ' ') camera.center(player);
+        if (key == ' ') player.interact(beds);
     }
 
     public void keyReleased() {

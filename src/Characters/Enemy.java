@@ -31,14 +31,17 @@ public class Enemy extends AStarCharacter {
 
     public boolean integrate(Camera camera, Player player) {
         trackingPlayer = false;
-        if (playerInVision(camera, player)) {
-            trackingPlayer = true;
-            lastHeardPosition = null;
-        } else {
-            int stepRadius = player.sneaking ? GameConstants.STEP_SOUND_RADIUS / 2 : GameConstants.STEP_SOUND_RADIUS;
 
-            checkIfCanHearPlayer(stepRadius, player, camera);
-        }
+        // if player is hiding, can't find him!
+        if (!player.hiding)
+            if (playerInVision(camera, player)) {
+                trackingPlayer = true;
+                lastHeardPosition = null;
+            } else {
+                int stepRadius = player.sneaking ? GameConstants.STEP_SOUND_RADIUS / 2 : GameConstants.STEP_SOUND_RADIUS;
+
+                checkIfCanHearPlayer(stepRadius, player, camera);
+            }
 
         PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
 

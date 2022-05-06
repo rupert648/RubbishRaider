@@ -35,6 +35,7 @@ public abstract class GameConstants {
     public static float ESCAPE_AREA_SIZE = 150f;
     public static int BED_WIDTH = 200;
     public static int BED_HEIGHT = 220;
+    public static int BED_INTERACT_AREA = 100;
 
     // random
     public static int LOST_FADE_IN_TIME = 150;

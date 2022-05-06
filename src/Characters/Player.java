@@ -4,18 +4,23 @@ import Camera.Camera;
 import Constants.GameConstants;
 import Level.Level;
 import PathFinding.AStarNode;
+import objects.Bed;
 import processing.core.PApplet;
 import Level.TileType;
 
 import processing.core.PVector;
 
+import java.util.ArrayList;
+
 import static processing.core.PApplet.atan2;
+import static processing.core.PConstants.PI;
 
 
 public class Player extends AStarCharacter {
 
     public boolean hasGoal = false;
     public boolean sneaking = false;
+    public boolean hiding = false;
 
     // moving directions
     boolean movingLeft;
@@ -42,16 +47,20 @@ public class Player extends AStarCharacter {
         // only update orientation if moved
         if (movingLeft) {
             velocity.x = -1 * maxSpeed * multiplier;
+            hiding = false;
             orientation = atan2(velocity.y, velocity.x);
         } else if (movingRight) {
             velocity.x = maxSpeed * multiplier;
+            hiding = false;
             orientation = atan2(velocity.y, velocity.x);
         } else velocity.x = 0;
         if (movingUp) {
             velocity.y = -1 * maxSpeed * multiplier;
+            hiding = false;
             orientation = atan2(velocity.y, velocity.x);
         } else if (movingDown) {
             velocity.y = maxSpeed * multiplier;
+            hiding = false;
             orientation = atan2(velocity.y, velocity.x);
         } else velocity.y = 0;
 
@@ -97,6 +106,34 @@ public class Player extends AStarCharacter {
             applet.fill(0);
         } else {
             currentStepRadius = 0;
+        }
+    }
+
+    public void interact(ArrayList<Bed> beds) {
+        // check if in range of any of the beds
+        for (Bed bed: beds) {
+            float dist = bed.position.dist(position);
+
+            if (dist < GameConstants.BED_INTERACT_AREA) {
+                hiding = true;
+                // jump to center of bed
+                position.x = bed.position.x;
+                position.y = bed.position.y;
+
+                if (bed.orientation == 0) {
+                    position.x += (float) GameConstants.BED_WIDTH / 2;
+                    position.y += (float) GameConstants.BED_HEIGHT / 2;
+                } else if (bed.orientation == PI/2) {
+                    position.x -= (float) GameConstants.BED_HEIGHT / 2;
+                    position.y += (float) GameConstants.BED_WIDTH / 2;
+                } else if (bed.orientation == PI) {
+                    position.x -= (float) GameConstants.BED_WIDTH / 2;
+                    position.y -= (float) GameConstants.BED_HEIGHT / 2;
+                } else if (bed.orientation == 3 * PI / 2) {
+                    position.x += (float) GameConstants.BED_HEIGHT / 2;
+                    position.y -= (float) GameConstants.BED_WIDTH / 2;
+                }
+            }
         }
     }
 
