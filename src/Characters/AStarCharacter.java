@@ -48,10 +48,27 @@ public abstract class AStarCharacter extends Character {
                 return true;
             }
 
+            // iterate from this and find last path that can be directly seen.
+            for (int i = currentAstarPathIndex; i < thePath.size(); i++) {
+                AStarNode current = thePath.get(i);
+                PVector currentVector = new PVector(0, 0);
+                currentVector.x = (current.getCol() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE / 2);
+                currentVector.y = (current.getRow() * GameConstants.V_GRANULE_SIZE + GameConstants.V_GRANULE_SIZE / 2);
+
+                // include camera
+                currentVector.sub(camera.position);
+
+                if (!efficientDDA(temp, currentVector, camera)) {
+                    currentAstarPathIndex = i - 1;
+                    break;
+                }
+            }
+
+            // seek first visible path
             AStarNode nextSquare = thePath.get(currentAstarPathIndex);
-            PVector nextSquareCoords = new PVector(0,0);
-            nextSquareCoords.x = nextSquare.getCol() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE/2;
-            nextSquareCoords.y = nextSquare.getRow() * GameConstants.V_GRANULE_SIZE + GameConstants.V_GRANULE_SIZE/2;
+            PVector nextSquareCoords = new PVector(0, 0);
+            nextSquareCoords.x = nextSquare.getCol() * GameConstants.H_GRANULE_SIZE + GameConstants.H_GRANULE_SIZE / 2;
+            nextSquareCoords.y = nextSquare.getRow() * GameConstants.V_GRANULE_SIZE + GameConstants.V_GRANULE_SIZE / 2;
 
             // calculate distance between position and next square point
             float dist = nextSquareCoords.dist(position);
@@ -60,10 +77,12 @@ public abstract class AStarCharacter extends Character {
                 currentAstarPathIndex++;
             }
 
-            // use next coords to calc direction
+
             nextSquareCoords.sub(camera.position);
 
             PVector p = new PVector(nextSquareCoords.x - temp.x, nextSquareCoords.y - temp.y);
+            orientation = applet.atan2(p.y, p.x) ;// direction to next square
+
             kinematicSeekPoint(p, scalar);
         }
 

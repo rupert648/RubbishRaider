@@ -4,6 +4,6 @@ public enum GameState {
     LOST,
     MENU,
     GENERATING,
-    WON,
+    LEVEL_WON,
     STARTING_LEVEL,
 }

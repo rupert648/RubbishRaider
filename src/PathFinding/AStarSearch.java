@@ -126,6 +126,8 @@ public class AStarSearch {
     public ArrayList<AStarNode> search(int sourceRow, int sourceCol, int goalRow, int goalCol) {
         reset();
         // initialise the open list
+        if (graph[sourceRow][sourceCol] == null) return null;
+
         open = new ArrayList<AStarNode>();
         open.add(graph[sourceRow][sourceCol]);
         graph[sourceRow][sourceCol].setCost(0);

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class RubbishRaider extends PApplet {
     // the current level
     public Level currentLevel = new Level(this);
-    public int level = 1;
+    public int level = 0;
     // the camera
     public Camera camera = new Camera(this, GameConstants.CAMERA_SPEED);
 
@@ -33,18 +33,23 @@ public class RubbishRaider extends PApplet {
     PImage BEDROOM_TILE;
     PImage LIVING_ROOM_TILE;
     PImage WALL_TILE;
+    PImage MENU1;
+    PImage MENU2;
+
+    boolean menuFlash = false;
 
     // gamestate options
-    GameState gm = GameState.GENERATING;
+    GameState gm = GameState.MENU;
     int startLevelFrame = 0;
     int youLostFrame = 0;
+    int wonLevelFrame = 0;
 
     // characters
-    Player player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 3.0f, 1.0f);
+    Player player;
     ArrayList<Enemy> enemies = new ArrayList<>();
 
     // objects
-    Goal goal = new Goal(GameConstants.MY_WIDTH / 2 + 100, GameConstants.MY_HEIGHT / 2 + 100);
+    Goal goal;
     EscapeArea escapeArea = new EscapeArea(GameConstants.MY_WIDTH / 5, GameConstants.MY_HEIGHT / 5);
     ArrayList<Bed> beds = new ArrayList<>();
 
@@ -57,27 +62,30 @@ public class RubbishRaider extends PApplet {
         size(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
     }
 
-    // initialise screen and particle array
     public void setup() {
         loadImages();
+    }
 
-        initEnemies();
-        newLevel();
-        player.setPathFinder(currentLevel);
+    public void initLevel() {
+        currentLevel = new Level(this);
+    }
 
-        // get created object arrays
-        beds = currentLevel.beds;
+    public void initPlayer() {
+        player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 10.0f, 1.0f);
+    }
 
-        // set enemy pathfinders
-        for (Enemy enemy : enemies) {
-            enemy.setPathFinder(currentLevel);
-        }
+    public void initGoal() {
+        goal = new Goal(GameConstants.MY_WIDTH / 2 + 100, GameConstants.MY_HEIGHT / 2 + 100);
     }
 
     public void initEnemies() {
         enemies = new ArrayList<>();
         // TODO: make adjust per level
-        for (int i = 0; i < GameConstants.START_NUMB_ENEMIES; i++) {
+
+        // new enemy every 2 levels
+        int numbEnemies = GameConstants.START_NUMB_ENEMIES + level / 2;
+
+        for (int i = 0; i < numbEnemies; i++) {
             Enemy enemy = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, GameConstants.ENEMY_MAX_SPEED, 1f, player);
             enemies.add(enemy);
         }
@@ -91,18 +99,48 @@ public class RubbishRaider extends PApplet {
             case PLAYING -> playGame();
             case LOST -> lost();
             case GENERATING -> generating();
-            case WON -> won();
+            case LEVEL_WON -> won();
             case STARTING_LEVEL -> startingLevelScreen();
         }
     }
 
     private void won() {
-        background(0);
-        text("YOU WON", (float) GameConstants.MY_WIDTH / 3, (float) GameConstants.MY_HEIGHT / 3);
+        playGame();
+
+        wonLevelFrame++;
+        int tintVal;
+        if (wonLevelFrame >= GameConstants.WON_FADE_IN_TIME) {
+            tintVal = 255;
+
+            if (wonLevelFrame >= GameConstants.LOST_FADE_IN_TIME + 100) {
+                // load the new level
+                wonLevelFrame = 0;
+                newLevel();
+            }
+        } else {
+            tintVal = (int) (((float) wonLevelFrame / (float) GameConstants.WON_FADE_IN_TIME) * 255f);
+        }
+
+        tint(255, tintVal);
+        imageMode(CORNER);
+        image(TRANSPARENT, 0, 0);
+        stroke(255, 0, 0);
+        textSize(50);
+        text("LEVEL  " + level + " COMPLETE", (float) GameConstants.MY_WIDTH / 2 - 100, (float) GameConstants.MY_HEIGHT / 2);
+        fill(0);
+        noStroke();
+        noTint();
     }
 
     private void menu() {
-        background(0);
+        level = 0;
+        imageMode(CORNER);
+
+        if (frameCount % 30 == 0) menuFlash = !menuFlash;
+
+        PImage image = menuFlash ? MENU1 : MENU2;
+
+        image(image, 0, 0);
     }
 
     private void paused() {
@@ -115,12 +153,18 @@ public class RubbishRaider extends PApplet {
         int tintVal;
         if (youLostFrame >= GameConstants.LOST_FADE_IN_TIME) {
             tintVal = 255;
+
+            if (youLostFrame >= GameConstants.LOST_FADE_IN_TIME + 100) {
+                gm = GameState.MENU;
+            }
         } else {
             tintVal = (int) (((float) youLostFrame / (float) GameConstants.LOST_FADE_IN_TIME) * 255f);
         }
 
         tint(255, tintVal);
+        imageMode(CORNER);
         image(YOU_LOST, 0, 0);
+        fill(255, 0, 0);
         noTint();
     }
 
@@ -166,11 +210,11 @@ public class RubbishRaider extends PApplet {
 
         renderUpdateGoal();
         renderUpdateEscapeArea();
-        if (gm != GameState.LOST)
+        if (gm != GameState.LOST && gm != GameState.LEVEL_WON)
             renderUpdatePlayer();
         renderUpdateEnemies();
         renderUpdateObjects();
-        camera.drawHud(goal);
+        camera.drawHud(goal, GOAL);
     }
 
     private void renderUpdatePlayer() {
@@ -209,9 +253,8 @@ public class RubbishRaider extends PApplet {
         if (!player.hasGoal) return;
 
         if (escapeArea.playerInArea(player)) {
-            gm = GameState.WON;
+            gm = GameState.LEVEL_WON;
         }
-
     }
 
     private void renderUpdateObjects() {
@@ -225,14 +268,36 @@ public class RubbishRaider extends PApplet {
     }
 
     public void newLevel() {
+        initLevel();
+        initPlayer();
+        initGoal();
+        initEnemies();
+
         gm = GameState.GENERATING;
+
+        level++;
 
         currentLevel.generateLevel(enemies, player, goal);
 
         gm = GameState.STARTING_LEVEL;
+
+        player.setPathFinder(currentLevel);
+
+        // get created object arrays
+        beds = currentLevel.beds;
+
+        // set enemy pathfinders
+        for (Enemy enemy : enemies) {
+            enemy.setPathFinder(currentLevel);
+        }
     }
 
     public void keyPressed() {
+        if (gm == GameState.MENU) {
+            handleMenuClick();
+            return;
+        }
+
         if (key == CODED) {
             // camera
             if (keyCode == UP) camera.movingUp();
@@ -252,6 +317,8 @@ public class RubbishRaider extends PApplet {
     }
 
     public void keyReleased() {
+        if (gm == GameState.MENU) return;
+
         if (key == CODED) {
             if (keyCode == UP) camera.stopMovingUp();
             if (keyCode == RIGHT) camera.stopMovingRight();
@@ -263,6 +330,12 @@ public class RubbishRaider extends PApplet {
         if (key == 'a') player.stopMovingLeft();
         if (key == 's') player.stopMovingDown();
         if (key == 'd') player.stopMovingRight();
+    }
+
+    public void handleMenuClick() {
+        if (key == '\n') {
+            newLevel();
+        }
     }
 
     public void loadImages() {
@@ -292,5 +365,10 @@ public class RubbishRaider extends PApplet {
         BEDROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         LIVING_ROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         WALL_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
+
+        MENU1 = loadImage("./assets/menu1.png");
+        MENU2 = loadImage("./assets/menu2.png");
+        MENU1.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
+        MENU2.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
     }
 }

@@ -117,7 +117,6 @@ public class Camera {
         applet.pushMatrix();
         applet.imageMode(CENTER);
         applet.translate(player.position.x - position.x, player.position.y - position.y);
-        float orientation = atan2(player.velocity.y, player.velocity.x);
         applet.rotate(player.orientation); // rotate 45 degrees
         applet.image(playerImage, 0, 0);
         applet.popMatrix();
@@ -148,10 +147,10 @@ public class Camera {
         applet.popMatrix();
     }
 
-    public void drawHud(Goal goal) {
+    public void drawHud(Goal goal, PImage GOAL) {
         if (!goal.pickedUp) return;
 
-        applet.text("Have goal", 10, 30);
+        applet.image(GOAL, 10, 30);
     }
 
     public void center(Player player) {

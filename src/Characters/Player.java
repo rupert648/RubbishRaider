@@ -39,8 +39,6 @@ public class Player extends AStarCharacter {
     public void integrate() {
         float multiplier = sneaking ? 0.5f : 1.0f;
 
-//        TODO: WALL COLLISION!
-
         // only update orientation if moved
         if (movingLeft) {
             velocity.x = -1 * maxSpeed * multiplier;
@@ -61,15 +59,22 @@ public class Player extends AStarCharacter {
         // Horizontal collisions
         if ((velocity.x < 0 && level.collidesXLeft(this)) ||
                 (velocity.x > 0 && level.collidesXRight(this))) {
+
+            // find closest empty square and move them to it
+            moveToClosestSquareHorizontal();
             velocity.x = 0;
         } else if ((velocity.y < 0 && level.collidesYUp(this)) ||
                 (velocity.y > 0 && level.collidesYDown(this))) {
+
+            moveToClosestSquareVertical();
             velocity.y = 0;
         }
 
         // update orientation
         position.add(velocity);
     }
+
+
 
     public boolean moving() {
         return velocity.x > 0.5f || velocity.y > 0.5f
@@ -84,8 +89,11 @@ public class Player extends AStarCharacter {
 
         if (currentStepRadius < stepRadius) {
             applet.noFill();
+            applet.stroke(255, 0, 0);
+            applet.strokeWeight(3.0f);
             applet.ellipse(position.x - camera.position.x, position.y - camera.position.y, currentStepRadius, currentStepRadius);
             currentStepRadius += GameConstants.STEP_RADIUS_INCR;
+            applet.stroke(0);
             applet.fill(0);
         } else {
             currentStepRadius = 0;

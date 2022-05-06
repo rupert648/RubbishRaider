@@ -69,6 +69,42 @@ public abstract class Character extends Movable {
         orientation = atan2(velocity.y, velocity.x);
     }
 
+    public void moveToClosestSquareHorizontal() {
+        int charX = (int) position.x;
+        int charCol = charX / GameConstants.H_GRANULE_SIZE;
+
+        // get x pos of nearest edge on right and left squares
+        float xLeftSquare = ((float) (charCol - 1) * GameConstants.H_GRANULE_SIZE) + (float) GameConstants.H_GRANULE_SIZE / 2;
+        float xRightSquare = ((float) (charCol + 1) * GameConstants.H_GRANULE_SIZE) - (float) GameConstants.H_GRANULE_SIZE / 2;
+
+        float distLeft = charX - xLeftSquare;
+        float distRight = xRightSquare - charX;
+
+        if (distLeft < distRight) {
+            position.x = xLeftSquare;
+        } else {
+            position.x = xRightSquare;
+        }
+    }
+
+    public void moveToClosestSquareVertical() {
+        int charY = (int) position.y;
+        int charRow = charY / GameConstants.V_GRANULE_SIZE;
+
+        // get y pos of nearest edge below and above
+        float yTopSquare = ((float) (charRow - 1) * GameConstants.V_GRANULE_SIZE) + (float) GameConstants.V_GRANULE_SIZE / 2;
+        float yBelowSquare = ((float) (charRow + 1) * GameConstants.V_GRANULE_SIZE) - (float) GameConstants.V_GRANULE_SIZE / 2;
+
+        float distTop = charY - yTopSquare;
+        float distBottom = yBelowSquare - charY;
+
+        if (distTop < distBottom) {
+            position.y = yTopSquare;
+        } else {
+            position.y = yBelowSquare;
+        }
+    }
+
     public void pursueCharacter(Character c, float scalar) {
         PVector direction = new PVector();
         direction.x = c.position.x - position.x;
@@ -162,31 +198,10 @@ public abstract class Character extends Movable {
         velocity.normalize();
         velocity.mult(maxSpeed * scalar);
 
-        float orientationIncrement = PI / 32;
-
         position.add(velocity);
         // Apply an impulse to bounce off the edge of the screen
         if ((position.x < 0) || (position.x > applet.width)) velocity.x = -velocity.x;
         if ((position.y < 0) || (position.y > applet.height)) velocity.y = -velocity.y;
-
-        //move a bit towards velocity:
-        // turn vel into orientation
-        float targetOrientation = atan2(velocity.y, velocity.x);
-
-        // Will take a frame extra at the PI boundary
-        if (abs(targetOrientation - orientation) <= orientationIncrement) {
-            orientation = targetOrientation;
-            return;
-        }
-
-        // if it's less than me, then how much if up to PI less, decrease otherwise increase
-        if (targetOrientation < orientation) {
-            if (orientation - targetOrientation < PI) orientation -= orientationIncrement;
-            else orientation += orientationIncrement;
-        } else {
-            if (targetOrientation - orientation < PI) orientation += orientationIncrement;
-            else orientation -= orientationIncrement;
-        }
     }
 
     public boolean seesCharacter(Character p) {

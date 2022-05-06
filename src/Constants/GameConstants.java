@@ -39,4 +39,5 @@ public abstract class GameConstants {
     // random
     public static int LOST_FADE_IN_TIME = 150;
     public static int START_LEVEL_FADE_IN_TIME = 150;
+    public static int WON_FADE_IN_TIME = 150;
 }
