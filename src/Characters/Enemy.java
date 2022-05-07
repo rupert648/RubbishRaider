@@ -17,7 +17,7 @@ public class Enemy extends AStarCharacter {
     Player player;
 
     boolean trackingPlayer;
-    boolean left;
+    boolean trackingObject;
 
     PVector lastHeardPosition;
 
@@ -29,11 +29,11 @@ public class Enemy extends AStarCharacter {
         velocity = new PVector(1f, 1f);
     }
 
-    public boolean integrate(Camera camera, Player player) {
+    public boolean integrate(Camera camera, Player player, boolean levelFinished) {
         trackingPlayer = false;
 
         // if player is hiding, can't find him!
-        if (!player.hiding)
+        if (!player.hiding || levelFinished) {
             if (playerInVision(camera, player)) {
                 trackingPlayer = true;
                 lastHeardPosition = null;
@@ -42,6 +42,7 @@ public class Enemy extends AStarCharacter {
 
                 checkIfCanHearPlayer(stepRadius, player, camera);
             }
+        }
 
         PVector temp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
 
@@ -59,15 +60,17 @@ public class Enemy extends AStarCharacter {
         if (lastHeardPosition != null) {
             if (position.dist(lastHeardPosition) < GameConstants.H_GRANULE_SIZE / 4.0f) {
                 lastHeardPosition = null;
+                if (trackingObject) trackingObject = false;
                 return false;
             }
 
             if (aStar(temp, camera, lastHeardPosition, 1.5f)) {
                 lastHeardPosition = null;
+                if (trackingObject) trackingObject = false;
             }
 
             // set orientation
-            orientation = velocity.heading();
+//            orientation = velocity.heading();
             return false;
         }
 
@@ -144,6 +147,14 @@ public class Enemy extends AStarCharacter {
     public void goToLocation(PVector pos) {
         pathFound = false;
         this.lastHeardPosition = pos;
+    }
+
+    public void trackObject(PVector pos) {
+        // don't track object if already tracking player
+        if (!trackingPlayer)
+            pathFound = false;
+            trackingObject = true;
+            this.lastHeardPosition = pos;
     }
 
     public void stopTracking() {

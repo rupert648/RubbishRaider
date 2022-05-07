@@ -308,7 +308,8 @@ public class Level {
             PImage BATHROOM_TILE,
             PImage BEDROOM_TILE,
             PImage LIVING_ROOM_TILE,
-            PImage WALL_TILE
+            PImage WALL_TILE,
+            PImage DEFAULT_TILE
     ) {
         app.fill(0);
         for (int row = 0; row < GameConstants.V_GRANULES; row++) {
@@ -325,12 +326,7 @@ public class Level {
                     case BEDROOM -> app.image(BEDROOM_TILE, xPos, yPos);
                     case LIVING_ROOM -> app.image(LIVING_ROOM_TILE, xPos, yPos);
                     case WALL -> app.image(WALL_TILE, xPos, yPos);
-                    default -> {
-                        setColour(tile);
-
-                        app.rect(xPos, yPos,
-                                GameConstants.H_GRANULE_SIZE, GameConstants.V_GRANULE_SIZE);
-                    }
+                    default -> app.image(DEFAULT_TILE, xPos, yPos);
                 }
             }
         }

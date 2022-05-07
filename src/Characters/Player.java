@@ -6,6 +6,7 @@ import Level.Level;
 import PathFinding.AStarNode;
 import objects.Bed;
 import processing.core.PApplet;
+import Throwable.Rock;
 import Level.TileType;
 
 import processing.core.PVector;
@@ -135,6 +136,10 @@ public class Player extends AStarCharacter {
                 }
             }
         }
+    }
+
+    public void throwRock(float mouseX, float mouseY, Rock rock) {
+        rock.launch(position.copy(), mouseX, mouseY);
     }
 
     public void movingLeft() {

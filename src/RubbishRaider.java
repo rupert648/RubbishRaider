@@ -2,7 +2,7 @@ import Camera.Camera;
 import Level.Level;
 import Characters.*;
 import Constants.*;
-import objects.Bed;
+import Throwable.Rock;
 import objects.EscapeArea;
 import objects.Goal;
 import processing.core.PApplet;
@@ -27,6 +27,10 @@ public class RubbishRaider extends PApplet {
     PImage TRANSPARENT;
     PImage ESCAPE_AREA;
 
+    // hud
+    PImage HUD;
+    PImage HUD_TICKED;
+
     // tiles
     PImage BATHROOM_TILE;
     PImage KITCHEN_TILE;
@@ -35,6 +39,7 @@ public class RubbishRaider extends PApplet {
     PImage WALL_TILE;
     PImage MENU1;
     PImage MENU2;
+    PImage DEFAULT_TILE;
 
     boolean menuFlash = false;
 
@@ -51,7 +56,9 @@ public class RubbishRaider extends PApplet {
     // objects
     Goal goal;
     EscapeArea escapeArea = new EscapeArea(GameConstants.MY_WIDTH / 5, GameConstants.MY_HEIGHT / 5);
-    ArrayList<Bed> beds = new ArrayList<>();
+    ArrayList<Rock> ammo;
+    int ammoAmount;
+//    ArrayList<Bed> beds = new ArrayList<>();
 
     public static void main(String[] args) {
         RubbishRaider main = new RubbishRaider();
@@ -88,6 +95,15 @@ public class RubbishRaider extends PApplet {
         for (int i = 0; i < numbEnemies; i++) {
             Enemy enemy = new Enemy(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, this, currentLevel, GameConstants.ENEMY_MAX_SPEED, 1f, player);
             enemies.add(enemy);
+        }
+    }
+
+    public void initAmmo() {
+        ammo = new ArrayList<>();
+        ammoAmount = GameConstants.AMMO_PER_LEVEL;
+        for (int i = 0; i < ammoAmount; i++) {
+            Rock rock = new Rock(this, player, camera);
+            ammo.add(rock);
         }
     }
 
@@ -206,7 +222,7 @@ public class RubbishRaider extends PApplet {
         background(0, 170, 0);
 
         camera.integrate(player);
-        camera.render(currentLevel, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE, WALL_TILE);
+        camera.render(currentLevel, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE, WALL_TILE, DEFAULT_TILE);
 
         renderUpdateGoal();
         renderUpdateEscapeArea();
@@ -214,7 +230,8 @@ public class RubbishRaider extends PApplet {
             renderUpdatePlayer();
         renderUpdateEnemies();
         renderUpdateObjects();
-        camera.drawHud(goal, GOAL);
+        renderUpdateThrowables();
+        camera.drawHud(goal, GOAL, HUD, HUD_TICKED);
     }
 
     private void renderUpdatePlayer() {
@@ -241,7 +258,7 @@ public class RubbishRaider extends PApplet {
     private void renderUpdateEnemy(Enemy enemy) {
         camera.drawEnemy(enemy, ENEMY_LEFT, ENEMY_RIGHT);
 
-        if (!enemy.integrate(camera, player)) return;
+        if (!enemy.integrate(camera, player, gm == GameState.LEVEL_WON)) return;
 
         // means player has been caught
         gm = GameState.LOST;
@@ -262,8 +279,21 @@ public class RubbishRaider extends PApplet {
     }
 
     private void renderUpdateBeds() {
-        for (Bed bed : beds) {
-            camera.drawBed(bed, BED);
+//        for (Bed bed : beds) {
+//            camera.drawBed(bed, BED);
+//        }
+    }
+
+    private void renderUpdateThrowables() {
+        for (Rock rock: ammo) {
+            renderThrowable(rock);
+        }
+    }
+
+    private void renderThrowable(Rock rock) {
+        if (rock.launched) {
+            rock.integrate(enemies);
+            camera.drawRock(rock);
         }
     }
 
@@ -272,6 +302,7 @@ public class RubbishRaider extends PApplet {
         initPlayer();
         initGoal();
         initEnemies();
+        initAmmo();
 
         gm = GameState.GENERATING;
 
@@ -284,7 +315,7 @@ public class RubbishRaider extends PApplet {
         player.setPathFinder(currentLevel);
 
         // get created object arrays
-        beds = currentLevel.beds;
+//        beds = currentLevel.beds;
 
         // set enemy pathfinders
         for (Enemy enemy : enemies) {
@@ -313,7 +344,7 @@ public class RubbishRaider extends PApplet {
         if (key == 's') player.movingDown();
         if (key == 'd') player.movingRight();
         if (key == 'c') camera.followingPlayer = !camera.followingPlayer;
-        if (key == ' ') player.interact(beds);
+//        if (key == ' ') player.interact(beds);
     }
 
     public void keyReleased() {
@@ -330,6 +361,21 @@ public class RubbishRaider extends PApplet {
         if (key == 'a') player.stopMovingLeft();
         if (key == 's') player.stopMovingDown();
         if (key == 'd') player.stopMovingRight();
+    }
+
+    public void mousePressed() {
+        // TODO: draw arc from raccoon to mouse location
+
+
+    }
+
+    public void mouseReleased() {
+        // throw rock
+
+        // check ammo
+        if (ammoAmount <= 0) return;
+
+        player.throwRock(mouseX, mouseY, ammo.get(ammo.size() - ammoAmount--));
     }
 
     public void handleMenuClick() {
@@ -360,15 +406,23 @@ public class RubbishRaider extends PApplet {
         BEDROOM_TILE = loadImage("./assets/bedroomTile.png");
         LIVING_ROOM_TILE = loadImage("./assets/livingRoomTile.png");
         WALL_TILE = loadImage("./assets/wallTile.png");
+        DEFAULT_TILE = loadImage("./assets/defaultTile.png");
         BATHROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         KITCHEN_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         BEDROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         LIVING_ROOM_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
         WALL_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
+        DEFAULT_TILE.resize(GameConstants.V_GRANULE_SIZE, GameConstants.H_GRANULE_SIZE);
 
         MENU1 = loadImage("./assets/menu1.png");
         MENU2 = loadImage("./assets/menu2.png");
         MENU1.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
         MENU2.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
+
+        HUD = loadImage("./assets/hud1.png");
+        HUD_TICKED = loadImage("./assets/hud2.png");
+        HUD.resize(200, 200);
+        HUD_TICKED.resize(200, 200);
     }
+
 }

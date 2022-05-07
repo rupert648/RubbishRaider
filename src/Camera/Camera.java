@@ -7,6 +7,7 @@ import Characters.Player;
 import objects.Bed;
 import objects.EscapeArea;
 import objects.Goal;
+import Throwable.Rock;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -64,9 +65,10 @@ public class Camera {
             PImage BATHROOM_TILE,
             PImage BEDROOM_TILE,
             PImage LIVING_ROOM_TILE,
-            PImage WALL_TILE
+            PImage WALL_TILE,
+            PImage DEFAULT_TILE
     ) {
-        current.render(position, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE, WALL_TILE);
+        current.render(position, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE, WALL_TILE, DEFAULT_TILE);
     }
 
     public void drawEnemy(Enemy enemy, PImage ENEMY_LEFT, PImage ENEMY_RIGHT) {
@@ -147,10 +149,46 @@ public class Camera {
         applet.popMatrix();
     }
 
-    public void drawHud(Goal goal, PImage GOAL) {
-        if (!goal.pickedUp) return;
+    public void drawRock(Rock rock) {
+        float xm = rock.position.x - position.x;
+        float ym = rock.position.y - position.y;
 
-        applet.image(GOAL, 10, 30);
+        // size calculate based on distance from middle point between start position and targetPosition
+        PVector midPoint = new PVector(0, 0);
+        float midX = rock.startPos.x + ((rock.landPos.x - rock.startPos.x) / 2);
+        float midY = rock.startPos.y + ((rock.landPos.y - rock.startPos.y) / 2);
+        midPoint.x = midX;
+        midPoint.y = midY;
+
+        // dist from midpoint
+        float dist = rock.position.dist(midPoint);
+        // take this as a proportion of the greatest distance from center
+        float prop = dist / rock.startPos.dist(midPoint);
+        // biggest when dist = 0
+        prop = 1 - prop;
+
+        // max of 1.5x original size
+        float scalar = 1.0f + prop * 2;
+
+        if (!rock.landed) {
+            applet.fill(0);
+            applet.circle(xm - 5, ym + 5, 10 * scalar * 0.5f);
+        }
+        applet.fill(50);
+        applet.circle(xm, ym, 10 * scalar);
+        applet.fill(0);
+
+    }
+
+    public void drawHud(Goal goal, PImage GOAL, PImage HUD, PImage HUD_TICKED) {
+
+        applet.imageMode(CORNER);
+        if (!goal.pickedUp)
+            applet.image(HUD, GameConstants.HUD_X, GameConstants. HUD_Y);
+        else
+            applet.image(HUD_TICKED, GameConstants.HUD_X, GameConstants. HUD_Y);
+
+        applet.image(GOAL, HUD_X + 10, HUD_Y + 30);
     }
 
     public void center(Player player) {

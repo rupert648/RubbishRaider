@@ -41,4 +41,14 @@ public abstract class GameConstants {
     public static int LOST_FADE_IN_TIME = 150;
     public static int START_LEVEL_FADE_IN_TIME = 150;
     public static int WON_FADE_IN_TIME = 150;
+
+    // TODO: digging (makes a lot of noise)
+
+    // HUD
+    public static int HUD_X = 10;
+    public static int HUD_Y = 30;
+
+    // ammo
+    public static int AMMO_PER_LEVEL = 10;
+    public static float ROCK_SPEED = 5;
 }
