@@ -180,7 +180,78 @@ public class Camera {
 
     }
 
-    public void drawHud(Goal goal, PImage GOAL, PImage HUD, PImage HUD_TICKED) {
+    public void drawCrosshair(Player player, int mouseX, int mouseY) {
+        // draw dotted line between 2
+        applet.strokeWeight(2);
+        dashline(
+                player.position.x - position.x,
+                player.position.y - position.y,
+                mouseX,
+                mouseY,
+                10.0f,
+                10.0f
+        );
+    }
+
+    void dashline(float x0, float y0, float x1, float y1, float[ ] spacing)
+    {
+        float distance = dist(x0, y0, x1, y1);
+        float [ ] xSpacing = new float[spacing.length];
+        float [ ] ySpacing = new float[spacing.length];
+        float drawn = 0.0f;  // amount of distance drawn
+
+        if (distance > 0)
+        {
+            int i;
+            boolean drawLine = true; // alternate between dashes and gaps
+
+    /*
+      Figure out x and y distances for each of the spacing values
+      I decided to trade memory for time; I'd rather allocate
+      a few dozen bytes than have to do a calculation every time
+      I draw.
+    */
+            for (i = 0; i < spacing.length; i++)
+            {
+                xSpacing[i] = lerp(0, (x1 - x0), spacing[i] / distance);
+                ySpacing[i] = lerp(0, (y1 - y0), spacing[i] / distance);
+            }
+
+            i = 0;
+            while (drawn < distance)
+            {
+                if (drawLine)
+                {
+                    applet.line(x0, y0, x0 + xSpacing[i], y0 + ySpacing[i]);
+                }
+                x0 += xSpacing[i];
+                y0 += ySpacing[i];
+                // Add distance "drawn" by this line or gap
+                drawn = drawn + mag(xSpacing[i], ySpacing[i]);
+                i = (i + 1) % spacing.length;  // cycle through array
+                drawLine = !drawLine;  // switch between dash and gap
+            }
+        }
+    }
+
+    void dashline(float x0, float y0, float x1, float y1, float dash, float gap)
+    {
+        float [ ] spacing = { dash, gap };
+        dashline(x0, y0, x1, y1, spacing);
+    }
+
+    public void drawHud(
+            Goal goal,
+            PImage GOAL,
+            PImage HUD,
+            PImage HUD_TICKED,
+            int ammoAmount,
+            int level,
+            int sprintDuration,
+            PImage COMPASS,
+            PImage COMPASS_ARROW,
+            EscapeArea es
+    ) {
 
         applet.imageMode(CORNER);
         if (!goal.pickedUp)
@@ -189,6 +260,68 @@ public class Camera {
             applet.image(HUD_TICKED, GameConstants.HUD_X, GameConstants. HUD_Y);
 
         applet.image(GOAL, HUD_X + 10, HUD_Y + 30);
+
+        outlinedText(Integer.toString(ammoAmount), HUD_X + 135, HUD_Y + 125);
+        outlinedText(Integer.toString(level), HUD_X + 135, HUD_Y + 180);
+
+        drawSprintBar(sprintDuration);
+        drawGoalCompass(goal, COMPASS, COMPASS_ARROW, es);
+    }
+
+    public void outlinedText(String text, int x, int y) {
+        applet.fill(0);
+        applet.textSize(50);
+        applet.textAlign(CENTER);
+        // below gives text an outline
+        for(int x2 = -1; x2 < 2; x2++){
+            applet.text(text, (float) x + x2, y);
+            applet.text(text, (float) x, y + x2);
+        }
+        applet.fill(255);
+        applet.text(text, (float) x, y);
+        applet.fill(0);
+    }
+
+    public void drawSprintBar(int sprintDuration) {
+        // proportion of bar filled
+        float proportion = (float) sprintDuration / (float) MAX_SPRINT_DURATION;
+
+        // inner bar
+        applet.fill(0, 255, 0);
+        applet.noStroke();
+        applet.shapeMode(CORNER);
+        float width = proportion * SPRINT_BAR_WIDTH;
+        applet.rect((MY_WIDTH / 2) - SPRINT_BAR_WIDTH / 2, (MY_HEIGHT - 30) - SPRINT_BAR_HEIGHT / 2, width, SPRINT_BAR_HEIGHT);
+
+
+        // outline bar
+        applet.noFill();
+        applet.stroke(0);
+        applet.strokeWeight(5);
+        applet.shapeMode(CENTER);
+        applet.rect((MY_WIDTH / 2) - SPRINT_BAR_WIDTH / 2, (MY_HEIGHT - 30) - SPRINT_BAR_HEIGHT / 2, SPRINT_BAR_WIDTH, SPRINT_BAR_HEIGHT);
+
+    }
+
+    public void drawGoalCompass(Goal goal, PImage COMPASS, PImage COMPASS_ARROW, EscapeArea es) {
+        // TODO: use goal
+        applet.imageMode(CENTER);
+        applet.image(COMPASS, COMPASS_X, COMPASS_Y);
+
+        PVector direction;
+        if (goal.pickedUp) {
+            direction = new PVector(es.position.x - position.x - COMPASS_X, es.position.y - position.y - COMPASS_Y);
+        } else {
+            direction = new PVector(goal.position.x - position.x - COMPASS_X, goal.position.y - position.y - COMPASS_Y);
+        }
+
+        applet.pushMatrix();
+        applet.imageMode(CENTER);
+        applet.translate(COMPASS_X, COMPASS_Y);
+        applet.rotate(direction.heading() + PI/2); // rotate 45 degrees
+        applet.image(COMPASS_ARROW, 0, 0);
+        applet.popMatrix();
+
     }
 
     public void center(Player player) {

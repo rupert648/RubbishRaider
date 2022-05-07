@@ -19,6 +19,8 @@ public abstract class GameConstants {
     // steps
     public static int STEP_SOUND_RADIUS = 300;
     public static int STEP_RADIUS_INCR = 5;
+    // maximum 5 seconds of sprint
+    public static int MAX_SPRINT_DURATION = 300;
 
     // camera
     public static float CAMERA_SPEED = 10.0f;
@@ -47,6 +49,10 @@ public abstract class GameConstants {
     // HUD
     public static int HUD_X = 10;
     public static int HUD_Y = 30;
+    public static int SPRINT_BAR_WIDTH = 400;
+    public static int SPRINT_BAR_HEIGHT = 20;
+    public static int COMPASS_X = MY_WIDTH - 90;
+    public static int COMPASS_Y = MY_HEIGHT - 90;
 
     // ammo
     public static int AMMO_PER_LEVEL = 10;

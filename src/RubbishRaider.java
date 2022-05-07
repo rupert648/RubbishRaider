@@ -6,6 +6,7 @@ import Throwable.Rock;
 import objects.EscapeArea;
 import objects.Goal;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PImage;
 
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ public class RubbishRaider extends PApplet {
     PImage GOAL;
     PImage TRANSPARENT;
     PImage ESCAPE_AREA;
+    PImage COMPASS;
+    PImage COMPASS_ARROW;
 
     // hud
     PImage HUD;
@@ -40,6 +43,9 @@ public class RubbishRaider extends PApplet {
     PImage MENU1;
     PImage MENU2;
     PImage DEFAULT_TILE;
+
+    // font
+    PFont font;
 
     boolean menuFlash = false;
 
@@ -71,6 +77,7 @@ public class RubbishRaider extends PApplet {
 
     public void setup() {
         loadImages();
+        cursor(CROSS);
     }
 
     public void initLevel() {
@@ -200,16 +207,24 @@ public class RubbishRaider extends PApplet {
             tintVal = 255 - (int) (((float) startLevelFrame / (float) GameConstants.LOST_FADE_IN_TIME) * 255f);
         }
 
+        // fading in image
         tint(255, tintVal);
         imageMode(CORNER);
         image(TRANSPARENT, 0, 0);
-        fill(255, 0, 0);
-        stroke(0);
-        textSize(50);
-        text("LEVEL  " + level, (float) GameConstants.MY_WIDTH / 2 - 40, (float) GameConstants.MY_HEIGHT / 2);
-        fill(0);
-        noStroke();
         noTint();
+
+        // text
+        fill(255);
+        textSize(50);
+        textAlign(CENTER);
+        // below gives text an outline
+        for(int x = -1; x < 2; x++){
+            text("LEVEL  " + level, (float) (GameConstants.MY_WIDTH / 2) + x, 100f);
+            text("LEVEL  " + level, (float) GameConstants.MY_WIDTH / 2, 100f + x);
+        }
+        fill(255, 0, 0);
+        text("LEVEL  " + level, (float) GameConstants.MY_WIDTH / 2, 100f);
+        fill(0);
 
         if (startLevelFrame >= GameConstants.START_LEVEL_FADE_IN_TIME) {
             startLevelFrame = 0;
@@ -231,7 +246,9 @@ public class RubbishRaider extends PApplet {
         renderUpdateEnemies();
         renderUpdateObjects();
         renderUpdateThrowables();
-        camera.drawHud(goal, GOAL, HUD, HUD_TICKED);
+        updateSprint();
+        camera.drawCrosshair(player, mouseX, mouseY);
+        camera.drawHud(goal, GOAL, HUD, HUD_TICKED, ammoAmount, level, player.sprintDuration, COMPASS, COMPASS_ARROW, escapeArea);
     }
 
     private void renderUpdatePlayer() {
@@ -297,6 +314,20 @@ public class RubbishRaider extends PApplet {
         }
     }
 
+    public void updateSprint() {
+        if (player.sprinting) {
+            // decrement sprint
+            if (player.sprintDuration <= 0) player.sprintDuration = 0;
+            else player.sprintDuration--;
+
+        } else {
+            // every 2 frames add duration
+            if (frameCount % 2 == 0)
+                if (player.sprintDuration >= GameConstants.MAX_SPRINT_DURATION) player.sprintDuration = GameConstants.MAX_SPRINT_DURATION;
+                else player.sprintDuration++;
+        }
+    }
+
     public void newLevel() {
         initLevel();
         initPlayer();
@@ -344,7 +375,7 @@ public class RubbishRaider extends PApplet {
         if (key == 's') player.movingDown();
         if (key == 'd') player.movingRight();
         if (key == 'c') camera.followingPlayer = !camera.followingPlayer;
-//        if (key == ' ') player.interact(beds);
+        if (key == ' ') player.sprint();
     }
 
     public void keyReleased() {
@@ -361,6 +392,7 @@ public class RubbishRaider extends PApplet {
         if (key == 'a') player.stopMovingLeft();
         if (key == 's') player.stopMovingDown();
         if (key == 'd') player.stopMovingRight();
+        if (key == ' ') player.stopSprinting();
     }
 
     public void mousePressed() {
@@ -423,6 +455,14 @@ public class RubbishRaider extends PApplet {
         HUD_TICKED = loadImage("./assets/hud2.png");
         HUD.resize(200, 200);
         HUD_TICKED.resize(200, 200);
+
+        COMPASS = loadImage("./assets/compass.png");
+        COMPASS_ARROW = loadImage("./assets/compassArrow.png");
+        COMPASS.resize(200, 200);
+        COMPASS_ARROW.resize(200, 200);
+
+        font = createFont("./assets/font.ttf", 128);
+        textFont(font);
     }
 
 }

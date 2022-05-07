@@ -28,6 +28,9 @@ public class Player extends AStarCharacter {
     boolean movingRight;
     boolean movingUp;
     boolean movingDown;
+    public boolean sprinting;
+
+    public int sprintDuration = GameConstants.MAX_SPRINT_DURATION;
 
     // Step (sound radius)
     int currentStepRadius = 0;
@@ -43,7 +46,12 @@ public class Player extends AStarCharacter {
     }
 
     public void integrate() {
-        float multiplier = sneaking ? 0.5f : 1.0f;
+        // get speed multiplier
+        float multiplier = sprinting ? 1.5f :
+                sneaking ? 0.5f : 1.0f;
+
+        // check has enough sprintDuration left;
+        multiplier = sprintDuration == 0 ? 1.0f : multiplier;
 
         // only update orientation if moved
         if (movingLeft) {
@@ -173,4 +181,14 @@ public class Player extends AStarCharacter {
     public void stopMovingDown() {
         movingDown = false;
     }
+
+    public void sprint() {
+        sneaking = false;
+        sprinting = true;
+    }
+
+    public void stopSprinting() {
+        sprinting = false;
+    }
 }
+
