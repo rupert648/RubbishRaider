@@ -7,10 +7,13 @@ import Characters.Player;
 import objects.Bed;
 import objects.EscapeArea;
 import objects.Goal;
+import Level.TileType;
 import Throwable.Rock;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
+
+import java.util.ArrayList;
 
 import static Constants.GameConstants.*;
 import static processing.core.PApplet.*;
@@ -115,12 +118,16 @@ public class Camera {
         applet.stroke(0);
     }
 
-    public void drawPlayer(Player player, PImage playerImage) {
+    boolean playerImage = true;
+    public void drawPlayer(Player player, PImage playerImage1, PImage playerImage2) {
         applet.pushMatrix();
         applet.imageMode(CENTER);
         applet.translate(player.position.x - position.x, player.position.y - position.y);
         applet.rotate(player.orientation); // rotate 45 degrees
-        applet.image(playerImage, 0, 0);
+
+        // switch frames whilst moving
+        if (player.moving() && applet.frameCount % 15 == 0) playerImage = !playerImage;
+        applet.image(playerImage ? playerImage1 : playerImage2, 0, 0);
         applet.popMatrix();
 
         player.drawStep(this);
@@ -134,7 +141,9 @@ public class Camera {
 
     public void drawEscapeArea(EscapeArea ea, PImage image) {
 
+        applet.imageMode(CORNER);
         applet.image(image, ea.position.x - position.x, ea.position.y - position.y);
+        applet.imageMode(CENTER);
     }
 
     public void drawBed(Bed bed, PImage bedImage) {
@@ -147,6 +156,60 @@ public class Camera {
 
         applet.image(bedImage, 0, 0, BED_WIDTH, BED_HEIGHT);
         applet.popMatrix();
+    }
+
+    public void drawMap(Level level, Player player, PImage racoonFace, EscapeArea es, PImage ESImage, ArrayList<Enemy> enemies) {
+
+        // code to center map
+        int mapWidth = V_GRANULES * V_MAP_GRANULE_SIZE;
+        int xDisplacement = (MY_WIDTH - mapWidth) / 2;
+        int mapHeight = H_GRANULES * H_MAP_GRANULE_SIZE;
+        int yDisplacement = (MY_HEIGHT - mapHeight) / 2;
+
+        // draw text
+        outlinedText("MAP", MY_WIDTH / 2, yDisplacement - 20);
+
+        for (int row = 0; row < V_GRANULES; row++) {
+            for (int col = 0; col < H_GRANULES; col++) {
+
+                TileType tile = level.getMap()[row][col];
+
+                float xPos = xDisplacement + col * V_MAP_GRANULE_SIZE;
+                float yPos = yDisplacement + row * H_MAP_GRANULE_SIZE;
+
+                applet.noStroke();
+
+                if (tile == TileType.WALL) {
+                    applet.fill(0);
+                    applet.rect(xPos, yPos, V_MAP_GRANULE_SIZE, H_MAP_GRANULE_SIZE);
+                } else {
+                    applet.fill(200);
+                    applet.rect(xPos, yPos, V_MAP_GRANULE_SIZE, H_MAP_GRANULE_SIZE);
+                }
+            }
+        }
+
+        // draw escape area
+        float xPos = xDisplacement + (es.position.x / V_GRANULE_SIZE) * V_MAP_GRANULE_SIZE;
+        float yPos = yDisplacement + (es.position.y / H_GRANULE_SIZE) * H_MAP_GRANULE_SIZE;
+        applet.image(ESImage, xPos, yPos, 20, 20);
+
+        // draw mini player onto the map
+        xPos = xDisplacement + (player.position.x / V_GRANULE_SIZE) * V_MAP_GRANULE_SIZE;
+        yPos = yDisplacement + (player.position.y / H_GRANULE_SIZE) * H_MAP_GRANULE_SIZE;
+        applet.imageMode(CENTER);
+        applet.image(racoonFace, xPos, yPos);
+
+        // draw mini enemies
+        applet.fill(255, 0, 0);
+        applet.strokeWeight(1);
+        for (Enemy enemy: enemies) {
+            xPos = xDisplacement + (enemy.position.x / V_GRANULE_SIZE) * V_MAP_GRANULE_SIZE;
+            yPos = yDisplacement + (enemy.position.y / H_GRANULE_SIZE) * H_MAP_GRANULE_SIZE;
+            applet.circle(xPos, yPos, 5);
+        }
+        applet.fill(0);
+        applet.strokeWeight(5);
     }
 
     public void drawRock(Rock rock) {
@@ -273,7 +336,7 @@ public class Camera {
         applet.textSize(50);
         applet.textAlign(CENTER);
         // below gives text an outline
-        for(int x2 = -1; x2 < 2; x2++){
+        for(int x2 = -1; x2 < 4; x2++){
             applet.text(text, (float) x + x2, y);
             applet.text(text, (float) x, y + x2);
         }
@@ -304,7 +367,6 @@ public class Camera {
     }
 
     public void drawGoalCompass(Goal goal, PImage COMPASS, PImage COMPASS_ARROW, EscapeArea es) {
-        // TODO: use goal
         applet.imageMode(CENTER);
         applet.image(COMPASS, COMPASS_X, COMPASS_Y);
 

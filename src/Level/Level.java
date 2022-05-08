@@ -14,6 +14,8 @@ import java.util.Random;
 
 import Constants.*;
 
+import static processing.core.PConstants.CORNER;
+
 public class Level {
     final int NUMB_OF_ATTEMPTS = 100;
     final int ROOM_SIZE = 15;
@@ -311,6 +313,7 @@ public class Level {
             PImage WALL_TILE,
             PImage DEFAULT_TILE
     ) {
+        app.imageMode(CORNER);
         app.fill(0);
         for (int row = 0; row < GameConstants.V_GRANULES; row++) {
             for (int col = 0; col < GameConstants.H_GRANULES; col++) {
@@ -479,58 +482,6 @@ public class Level {
             }
         }
         return false;
-    }
-
-    public void setColour(TileType t) {
-        if (t == null) {
-            app.fill(255, 0, 0);
-            return;
-        }
-
-        // tile colouring
-
-        switch (t) {
-            case BATHROOM -> {
-                app.fill(bathroom.x, bathroom.y, bathroom.z);
-                app.stroke(bathroom.x, bathroom.y, bathroom.z);
-            }
-            case GENERIC -> {
-                app.fill(generic.x, generic.y, generic.z);
-                app.stroke(generic.x, generic.y, generic.z);
-            }
-            case BEDROOM -> {
-                app.fill(bedroom.x, bedroom.y, bedroom.z);
-                app.stroke(bedroom.x, bedroom.y, bedroom.z);
-            }
-            case KITCHEN -> {
-                app.fill(kitchen.x, kitchen.y, kitchen.z);
-                app.stroke(kitchen.x, kitchen.y, kitchen.z);
-            }
-            case LIVING_ROOM -> {
-                app.fill(livingRoom.x, livingRoom.y, livingRoom.z);
-                app.stroke(livingRoom.x, livingRoom.y, livingRoom.z);
-            }
-            case WALL -> {
-                app.fill(wall.x, wall.y, wall.z);
-                app.stroke(wall.x, wall.y, wall.z);
-            }
-            case BED_DUVET -> {
-                app.fill(bedDuvet.x, bedDuvet.y, bedDuvet.z);
-                app.stroke(bedDuvet.x, bedDuvet.y, bedDuvet.z);
-            }
-            case BED_PILLOW -> {
-                app.fill(bedPillow.x, bedPillow.y, bedPillow.z);
-                app.stroke(bedPillow.x, bedPillow.y, bedPillow.z);
-            }
-            case CABINET -> {
-                app.fill(cabinet.x, cabinet.y, cabinet.z);
-                app.stroke(cabinet.x, cabinet.y, cabinet.z);
-            }
-            default -> {
-                app.fill(defaultCol.x, defaultCol.y, defaultCol.z);
-                app.stroke(defaultCol.x, defaultCol.y, defaultCol.z);
-            }
-        }
     }
 
     public TileType[][] getMap() {

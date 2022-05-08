@@ -33,7 +33,7 @@ public class Enemy extends AStarCharacter {
         trackingPlayer = false;
 
         // if player is hiding, can't find him!
-        if (!player.hiding || levelFinished) {
+        if (!levelFinished && !player.hiding) {
             if (playerInVision(camera, player)) {
                 trackingPlayer = true;
                 lastHeardPosition = null;

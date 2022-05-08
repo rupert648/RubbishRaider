@@ -53,25 +53,107 @@ public class Player extends AStarCharacter {
         // check has enough sprintDuration left;
         multiplier = sprintDuration == 0 ? 1.0f : multiplier;
 
-        // only update orientation if moved
         if (movingLeft) {
-            velocity.x = -1 * maxSpeed * multiplier;
-            hiding = false;
+            if (movingUp) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x = -1 * speed2;
+                velocity.y = -1 * speed2;
+
+            } else if (movingDown) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x = -1 * speed2;
+                velocity.y = speed2;
+            } else {
+                velocity.x = -1 * maxSpeed * multiplier;
+                velocity.y = 0;
+            }
             orientation = atan2(velocity.y, velocity.x);
+
         } else if (movingRight) {
-            velocity.x = maxSpeed * multiplier;
-            hiding = false;
+            if (movingUp) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x =  speed2;
+                velocity.y = -1 * speed2;
+
+            } else if (movingDown) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x = speed2;
+                velocity.y = speed2;
+            } else {
+                velocity.x = maxSpeed * multiplier;
+                velocity.y = 0;
+            }
             orientation = atan2(velocity.y, velocity.x);
-        } else velocity.x = 0;
-        if (movingUp) {
-            velocity.y = -1 * maxSpeed * multiplier;
-            hiding = false;
+        } else if (movingUp) {
+            if (movingLeft) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x = -1 * speed2;
+                velocity.y = -1 * speed2;
+
+            } else if (movingRight) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x = speed2;
+                velocity.y = -1 * speed2;
+            } else {
+                velocity.x = 0;
+                velocity.y = -1 * maxSpeed * multiplier;
+            }
             orientation = atan2(velocity.y, velocity.x);
         } else if (movingDown) {
-            velocity.y = maxSpeed * multiplier;
-            hiding = false;
+            if (movingLeft) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x = -1 * speed2;
+                velocity.y =  speed2;
+
+            } else if (movingRight) {
+                float speed = maxSpeed * multiplier;
+                float speed2 = (float) Math.sqrt((speed * speed) / 2);
+
+                velocity.x = speed2;
+                velocity.y = speed2;
+            } else {
+                velocity.x = 0;
+                velocity.y = maxSpeed * multiplier;
+            }
             orientation = atan2(velocity.y, velocity.x);
-        } else velocity.y = 0;
+        } else {
+            velocity.x = 0;
+            velocity.y = 0;
+        }
+
+        // only update orientation if moved
+//        if (movingLeft) {
+//            velocity.x = -1 * maxSpeed * multiplier;
+//            hiding = false;
+//            orientation = atan2(velocity.y, velocity.x);
+//        } else if (movingRight) {
+//            velocity.x = maxSpeed * multiplier;
+//            hiding = false;
+//            orientation = atan2(velocity.y, velocity.x);
+//        } else velocity.x = 0;
+//        if (movingUp) {
+//            velocity.y = -1 * maxSpeed * multiplier;
+//            hiding = false;
+//            orientation = atan2(velocity.y, velocity.x);
+//        } else if (movingDown) {
+//            velocity.y = maxSpeed * multiplier;
+//            hiding = false;
+//            orientation = atan2(velocity.y, velocity.x);
+//        } else velocity.y = 0;
 
         // Deal with collisions by stopping dead. Bit crude.
         // Horizontal collisions
@@ -79,13 +161,12 @@ public class Player extends AStarCharacter {
                 (velocity.x > 0 && level.collidesXRight(this))) {
 
             // find closest empty square and move them to it
-            moveToClosestSquareHorizontal();
             velocity.x = 0;
+            moveToClosestSquareHorizontal();
         } else if ((velocity.y < 0 && level.collidesYUp(this)) ||
                 (velocity.y > 0 && level.collidesYDown(this))) {
-
-            moveToClosestSquareVertical();
             velocity.y = 0;
+            moveToClosestSquareVertical();
         }
 
         // update orientation

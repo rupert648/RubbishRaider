@@ -9,8 +9,14 @@ public abstract class GameConstants {
     public static int H_GRANULES = 100;
 
     // and how big are they?
-    public static int V_GRANULE_SIZE = 25;
-    public static int H_GRANULE_SIZE = 25;
+    public static int V_GRANULE_SIZE = 50;
+    public static int H_GRANULE_SIZE = 50;
+
+    // map
+    public static int V_MAP_GRANULE_SIZE = 5;
+    public static int H_MAP_GRANULE_SIZE = 5;
+    public static int RACCOON_FACE_HEIGHT = 20;
+    public static int RACCOON_FACE_WIDTH = 20;
 
     // PLAYER CONSTANTS
     // player size
@@ -26,8 +32,8 @@ public abstract class GameConstants {
     public static float CAMERA_SPEED = 10.0f;
 
     // enemy constants
-    public static int START_NUMB_ENEMIES = 3;
-    public static float VISION_SIZE = 200.0f;
+    public static int START_NUMB_ENEMIES = 7;
+    public static float VISION_SIZE = 300.0f;
     public static int CONE_ANGLE = 50;
     public static float ENEMY_MAX_SPEED = 2f;
     public static int CATCH_RADIUS = 20;
