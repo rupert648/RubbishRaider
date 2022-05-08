@@ -174,6 +174,7 @@ public class RubbishRaider extends PApplet {
     }
 
     private void paused() {
+
     }
 
     private void lost() {
@@ -377,7 +378,6 @@ public class RubbishRaider extends PApplet {
             if (keyCode == LEFT) camera.movingLeft();
             if (keyCode == DOWN) camera.movingDown();
             if (keyCode == CONTROL) player.dig(enemies);
-
             if (keyCode == SHIFT) player.sneaking = !player.sneaking;
         }
 
@@ -388,6 +388,11 @@ public class RubbishRaider extends PApplet {
         if (key == 'c') camera.followingPlayer = !camera.followingPlayer;
         if (key == ' ') player.sprint();
         if (key == 'm') showingMap = true;
+        if (key == 'p') {
+            if (gm == GameState.PAUSED)
+                gm = GameState.PLAYING;
+            else gm = GameState.PAUSED;
+        }
     }
 
     public void keyReleased() {

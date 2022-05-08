@@ -23,7 +23,7 @@ public abstract class GameConstants {
     public static int PLAYER_SIZE_X = 10;
     public static int PLAYER_SIZE_Y = 10;
     // steps
-    public static int STEP_SOUND_RADIUS = 300;
+    public static int STEP_SOUND_RADIUS = 500;
     public static int STEP_RADIUS_INCR = 5;
     // maximum 5 seconds of sprint
     public static int MAX_SPRINT_DURATION = 300;
