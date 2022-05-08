@@ -8,12 +8,5 @@ public enum TileType {
     KITCHEN,
     BEDROOM,
     GENERIC,
-    FURNITURE,
-
-    // bed
-    BED_PILLOW,
-    BED_DUVET,
-
-    // cabinet
-    CABINET,
+    PERIMITER,
 }

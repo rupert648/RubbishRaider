@@ -27,13 +27,14 @@ public abstract class GameConstants {
     public static int STEP_RADIUS_INCR = 5;
     // maximum 5 seconds of sprint
     public static int MAX_SPRINT_DURATION = 300;
+    public static int DIG_TIME = 90;
 
     // camera
     public static float CAMERA_SPEED = 10.0f;
 
     // enemy constants
     public static int START_NUMB_ENEMIES = 7;
-    public static float VISION_SIZE = 300.0f;
+    public static float VISION_SIZE = 500.0f;
     public static int CONE_ANGLE = 50;
     public static float ENEMY_MAX_SPEED = 2f;
     public static int CATCH_RADIUS = 20;
@@ -49,7 +50,8 @@ public abstract class GameConstants {
     public static int START_LEVEL_FADE_IN_TIME = 150;
     public static int WON_FADE_IN_TIME = 150;
 
-    // TODO: digging (makes a lot of noise)
+    // digging
+    public static int DIG_SOUND_RADIUS = 1000;
 
     // HUD
     public static int HUD_X = 10;

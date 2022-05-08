@@ -49,12 +49,12 @@ public class Level {
 
         // ensure edges are walls
         for (int i = 0; i < GameConstants.H_GRANULES; i++) {
-            map[0][i] = TileType.WALL;
-            map[GameConstants.V_GRANULES - 1][i] = TileType.WALL;
+            map[0][i] = TileType.PERIMITER;
+            map[GameConstants.V_GRANULES - 1][i] = TileType.PERIMITER;
         }
         for (int i = 0; i < GameConstants.V_GRANULES; i++) {
-            map[i][0] = TileType.WALL;
-            map[i][GameConstants.H_GRANULES - 1] = TileType.WALL;
+            map[i][0] = TileType.PERIMITER;
+            map[i][GameConstants.H_GRANULES - 1] = TileType.PERIMITER;
         }
     }
 
@@ -319,6 +319,7 @@ public class Level {
                     case BEDROOM -> app.image(BEDROOM_TILE, xPos, yPos);
                     case LIVING_ROOM -> app.image(LIVING_ROOM_TILE, xPos, yPos);
                     case WALL -> app.image(WALL_TILE, xPos, yPos);
+                    case PERIMITER -> app.image(WALL_TILE, xPos, yPos);
                     default -> app.image(DEFAULT_TILE, xPos, yPos);
                 }
             }
@@ -344,7 +345,7 @@ public class Level {
                 return false;
             }
 
-            if (map[row][col] == TileType.WALL) {
+            if (map[row][col] == TileType.WALL || map[row][col] == TileType.PERIMITER) {
                 int blockX = col * GameConstants.H_GRANULE_SIZE;
                 int blockY = row * GameConstants.V_GRANULE_SIZE;
                 if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)
@@ -379,7 +380,7 @@ public class Level {
                 return false;
             }
 
-            if (map[row][col] == TileType.WALL) {
+            if (map[row][col] == TileType.WALL || map[row][col] == TileType.PERIMITER) {
                 int blockX = col * GameConstants.H_GRANULE_SIZE;
                 int blockY = row * GameConstants.V_GRANULE_SIZE;
                 if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)
@@ -413,7 +414,7 @@ public class Level {
                 return false;
             }
 
-            if (map[row][col] == TileType.WALL) {
+            if (map[row][col] == TileType.WALL || map[row][col] == TileType.PERIMITER) {
                 int blockX = col * GameConstants.H_GRANULE_SIZE;
                 int blockY = row * GameConstants.V_GRANULE_SIZE;
                 if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)
@@ -457,7 +458,7 @@ public class Level {
                 return false;
             }
 
-            if (map[row][col] == TileType.WALL) {
+            if (map[row][col] == TileType.WALL || map[row][col] == TileType.PERIMITER) {
                 int blockX = col * GameConstants.H_GRANULE_SIZE;
                 int blockY = row * GameConstants.V_GRANULE_SIZE;
                 if (blockX - charX > GameConstants.PLAYER_SIZE_X / 2)

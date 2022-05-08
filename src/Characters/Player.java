@@ -3,7 +3,7 @@ package Characters;
 import Camera.Camera;
 import Constants.GameConstants;
 import Level.Level;
-import objects.Bed;
+import Level.TileType;
 import objects.Vent;
 import processing.core.PApplet;
 import Throwable.Rock;
@@ -14,11 +14,17 @@ import java.util.ArrayList;
 
 import static processing.core.PApplet.atan2;
 
-public class Player extends AStarCharacter {
+public class Player extends Character {
 
     public boolean hasGoal = false;
     public boolean sneaking = false;
     public boolean hiding = false;
+
+    // digging vars
+    public boolean digging = false;
+    public int diggingCol;
+    public int diggingRow;
+    public int diggingTimer = 0;
 
     // moving directions
     boolean movingLeft;
@@ -42,7 +48,12 @@ public class Player extends AStarCharacter {
         rotation = 0;
     }
 
-    public void integrate() {
+    public void integrate(ArrayList<Enemy> enemies) {
+        if (digging) {
+            performDig(enemies);
+            return;
+        };
+
         // get speed multiplier
         float multiplier = sprinting ? 1.5f :
                 sneaking ? 0.5f : 1.0f;
@@ -150,7 +161,22 @@ public class Player extends AStarCharacter {
         position.add(velocity);
     }
 
+    public void performDig(ArrayList<Enemy> enemies) {
+        diggingTimer++;
 
+        if (diggingTimer > GameConstants.DIG_TIME) {
+            digging = false;
+            diggingTimer = 0;
+            // change block
+            level.getMap()[diggingRow][diggingCol] = TileType.GENERIC;
+        }
+
+        // must reset AStar search for new map
+        // set enemy pathfinders
+        for (Enemy enemy : enemies) {
+            enemy.setPathFinder(level);
+        }
+    }
 
     public boolean moving() {
         return velocity.x > 0.5f || velocity.y > 0.5f
@@ -194,6 +220,54 @@ public class Player extends AStarCharacter {
             if (vent.playerInArea(this)) {
                 hiding = true;
                 vent.containsPlayer = true;
+            }
+        }
+    }
+
+    public void dig(ArrayList<Enemy> enemies) {
+        TileType[][] map = level.getMap();
+
+        // find nearest WALL tile
+        int playerRow = (int) (position.y / GameConstants.V_GRANULE_SIZE);
+        int playerCol = (int) (position.x / GameConstants.H_GRANULE_SIZE);
+
+        int nearestRow;
+        int nearestCol;
+
+        // search out in each direction
+        TileType north = map[playerRow - 1][playerCol];
+        TileType east = map[playerRow][playerCol + 1];
+        TileType south = map[playerRow + 1][playerCol];
+        TileType west = map[playerRow][playerCol - 1];
+
+        if (north == TileType.WALL) {
+            nearestRow = playerRow - 1;
+            nearestCol = playerCol;
+        } else if (east == TileType.WALL) {
+            nearestRow = playerRow;
+            nearestCol = playerCol + 1;
+        } else if (south == TileType.WALL) {
+            nearestRow = playerRow + 1;
+            nearestCol = playerCol;
+        } else if (west == TileType.WALL) {
+            nearestRow = playerRow;
+            nearestCol = playerCol - 1;
+        } else return;
+
+        digBlock(nearestCol, nearestRow, enemies);
+    }
+
+    public void digBlock(int col, int row, ArrayList<Enemy> enemies) {
+        digging = true;
+        diggingCol = col;
+        diggingRow = row;
+
+        // alert any enemies in a wide radius
+        for (Enemy enemy: enemies) {
+            float dist = position.dist(enemy.position);
+
+            if (dist < GameConstants.DIG_SOUND_RADIUS) {
+                enemy.lastHeardPosition = position.copy();
             }
         }
     }

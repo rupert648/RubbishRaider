@@ -15,12 +15,7 @@ public class RoomGenerator {
 
     // object arrays
     public ArrayList<Vent> vents = new ArrayList<>();
-    // todo: need to maintain this, could tidy up data structures to better represent furniture tiles
-    TileType[] furnitureTiles = {
-            TileType.BED_DUVET,
-            TileType.BED_PILLOW,
-            TileType.CABINET
-    };
+
     private TileType[][] map;
 
     public RoomGenerator(TileType[][] map) {

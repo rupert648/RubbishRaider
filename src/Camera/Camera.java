@@ -168,7 +168,7 @@ public class Camera {
 
                 applet.noStroke();
 
-                if (tile == TileType.WALL) {
+                if (tile == TileType.WALL || tile == TileType.PERIMITER) {
                     applet.fill(0);
                     applet.rect(xPos, yPos, V_MAP_GRANULE_SIZE, H_MAP_GRANULE_SIZE);
                 } else {

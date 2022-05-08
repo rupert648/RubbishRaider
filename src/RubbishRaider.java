@@ -264,7 +264,7 @@ public class RubbishRaider extends PApplet {
 
         if (player.hiding) return;
 
-        player.integrate();
+        player.integrate(enemies);
         camera.drawPlayer(player, PLAYER_IMAGE1, PLAYER_IMAGE2);
     }
 
@@ -358,8 +358,6 @@ public class RubbishRaider extends PApplet {
 
         gm = GameState.STARTING_LEVEL;
 
-        player.setPathFinder(currentLevel);
-
         // set enemy pathfinders
         for (Enemy enemy : enemies) {
             enemy.setPathFinder(currentLevel);
@@ -378,6 +376,7 @@ public class RubbishRaider extends PApplet {
             if (keyCode == RIGHT) camera.movingRight();
             if (keyCode == LEFT) camera.movingLeft();
             if (keyCode == DOWN) camera.movingDown();
+            if (keyCode == CONTROL) player.dig(enemies);
 
             if (keyCode == SHIFT) player.sneaking = !player.sneaking;
         }
