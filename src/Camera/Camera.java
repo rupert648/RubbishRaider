@@ -9,6 +9,7 @@ import objects.EscapeArea;
 import objects.Goal;
 import Level.TileType;
 import Throwable.Rock;
+import objects.Vent;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -146,18 +147,6 @@ public class Camera {
         applet.imageMode(CENTER);
     }
 
-    public void drawBed(Bed bed, PImage bedImage) {
-        applet.circle(bed.position.x - position.x, bed.position.y - position.y, 10);
-
-        applet.pushMatrix();
-        applet.imageMode(CORNER);
-        applet.translate(bed.position.x - position.x, bed.position.y - position.y);
-        applet.rotate(bed.orientation);
-
-        applet.image(bedImage, 0, 0, BED_WIDTH, BED_HEIGHT);
-        applet.popMatrix();
-    }
-
     public void drawMap(Level level, Player player, PImage racoonFace, EscapeArea es, PImage ESImage, ArrayList<Enemy> enemies) {
 
         // code to center map
@@ -210,6 +199,11 @@ public class Camera {
         }
         applet.fill(0);
         applet.strokeWeight(5);
+    }
+
+    public void drawVent(Vent vent, PImage VENT, PImage VENT2) {
+        applet.imageMode(CORNER);
+        applet.image(vent.containsPlayer ? VENT2 : VENT, vent.position.x - position.x, vent.position.y - position.y);
     }
 
     public void drawRock(Rock rock) {

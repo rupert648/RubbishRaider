@@ -5,6 +5,7 @@ import Constants.GameConstants;
 import Level.Level;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
 
 import static Constants.GameConstants.CONE_ANGLE;
@@ -29,7 +30,7 @@ public class Enemy extends AStarCharacter {
         velocity = new PVector(1f, 1f);
     }
 
-    public boolean integrate(Camera camera, Player player, boolean levelFinished) {
+    public boolean integrate(Camera camera, Player player, boolean levelFinished, PImage EXCLAMATION) {
         trackingPlayer = false;
 
         // if player is hiding, can't find him!
@@ -53,6 +54,9 @@ public class Enemy extends AStarCharacter {
             // set orientation
             orientation = velocity.heading();
 
+            // draw exclamation
+            applet.image(EXCLAMATION, position.x - camera.position.x + 10, position.y - camera.position.y - 10);
+
             // check for collision only if tracking player, prevents calling every frame
             return checkIfCaughtPlayer(player);
         }
@@ -69,8 +73,9 @@ public class Enemy extends AStarCharacter {
                 if (trackingObject) trackingObject = false;
             }
 
-            // set orientation
-//            orientation = velocity.heading();
+            // draw exclamation
+            applet.image(EXCLAMATION, position.x - camera.position.x, position.y - camera.position.y - 50);
+
             return false;
         }
 

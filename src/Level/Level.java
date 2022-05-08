@@ -3,8 +3,8 @@ package Level;
 import Characters.Enemy;
 import Characters.Movable;
 import Characters.Player;
-import objects.Bed;
 import objects.Goal;
+import objects.Vent;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -20,18 +20,8 @@ public class Level {
     final int NUMB_OF_ATTEMPTS = 100;
     final int ROOM_SIZE = 15;
     // object arrays following init
-    public ArrayList<Bed> beds = new ArrayList<Bed>();
+    public ArrayList<Vent> vents = new ArrayList<>();
     // room colours
-    PVector bathroom = new PVector(173, 216, 230);
-    PVector generic = new PVector(220, 220, 220);
-    PVector bedroom = new PVector(255, 215, 0);
-    PVector kitchen = new PVector(255, 255, 255);
-    PVector livingRoom = new PVector(0, 255, 0);
-    PVector wall = new PVector(0, 0, 0);
-    PVector defaultCol = new PVector(255, 0, 0);
-    PVector bedDuvet = new PVector(0, 0, 220);
-    PVector bedPillow = new PVector(255, 255, 255);
-    PVector cabinet = new PVector(165, 42, 42);
     PApplet app;
     private TileType[][] map;
 
@@ -55,7 +45,7 @@ public class Level {
 
         // get updated values
         map = rg.getMap();
-        beds = rg.beds;
+        this.vents = rg.vents;
 
         // ensure edges are walls
         for (int i = 0; i < GameConstants.H_GRANULES; i++) {

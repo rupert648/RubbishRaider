@@ -3,19 +3,16 @@ package Characters;
 import Camera.Camera;
 import Constants.GameConstants;
 import Level.Level;
-import PathFinding.AStarNode;
 import objects.Bed;
+import objects.Vent;
 import processing.core.PApplet;
 import Throwable.Rock;
-import Level.TileType;
 
 import processing.core.PVector;
 
 import java.util.ArrayList;
 
 import static processing.core.PApplet.atan2;
-import static processing.core.PConstants.PI;
-
 
 public class Player extends AStarCharacter {
 
@@ -135,26 +132,6 @@ public class Player extends AStarCharacter {
             velocity.y = 0;
         }
 
-        // only update orientation if moved
-//        if (movingLeft) {
-//            velocity.x = -1 * maxSpeed * multiplier;
-//            hiding = false;
-//            orientation = atan2(velocity.y, velocity.x);
-//        } else if (movingRight) {
-//            velocity.x = maxSpeed * multiplier;
-//            hiding = false;
-//            orientation = atan2(velocity.y, velocity.x);
-//        } else velocity.x = 0;
-//        if (movingUp) {
-//            velocity.y = -1 * maxSpeed * multiplier;
-//            hiding = false;
-//            orientation = atan2(velocity.y, velocity.x);
-//        } else if (movingDown) {
-//            velocity.y = maxSpeed * multiplier;
-//            hiding = false;
-//            orientation = atan2(velocity.y, velocity.x);
-//        } else velocity.y = 0;
-
         // Deal with collisions by stopping dead. Bit crude.
         // Horizontal collisions
         if ((velocity.x < 0 && level.collidesXLeft(this)) ||
@@ -199,30 +176,24 @@ public class Player extends AStarCharacter {
         }
     }
 
-    public void interact(ArrayList<Bed> beds) {
+    public void interact(ArrayList<Vent> vents) {
+        if (hiding) {
+            hiding = false;
+
+            // reset all vents status
+            for (Vent vent: vents) {
+                vent.containsPlayer = false;
+            }
+
+            return;
+        }
+
         // check if in range of any of the beds
-        for (Bed bed: beds) {
-            float dist = bed.position.dist(position);
+        for (Vent vent: vents) {
 
-            if (dist < GameConstants.BED_INTERACT_AREA) {
+            if (vent.playerInArea(this)) {
                 hiding = true;
-                // jump to center of bed
-                position.x = bed.position.x;
-                position.y = bed.position.y;
-
-                if (bed.orientation == 0) {
-                    position.x += (float) GameConstants.BED_WIDTH / 2;
-                    position.y += (float) GameConstants.BED_HEIGHT / 2;
-                } else if (bed.orientation == PI/2) {
-                    position.x -= (float) GameConstants.BED_HEIGHT / 2;
-                    position.y += (float) GameConstants.BED_WIDTH / 2;
-                } else if (bed.orientation == PI) {
-                    position.x -= (float) GameConstants.BED_WIDTH / 2;
-                    position.y -= (float) GameConstants.BED_HEIGHT / 2;
-                } else if (bed.orientation == 3 * PI / 2) {
-                    position.x += (float) GameConstants.BED_HEIGHT / 2;
-                    position.y -= (float) GameConstants.BED_WIDTH / 2;
-                }
+                vent.containsPlayer = true;
             }
         }
     }

@@ -41,9 +41,8 @@ public abstract class GameConstants {
     // objects
     public static float OBJECT_PICKUP_RADIUS = 20f;
     public static float ESCAPE_AREA_SIZE = 150f;
-    public static int BED_WIDTH = 200;
-    public static int BED_HEIGHT = 220;
-    public static int BED_INTERACT_AREA = 100;
+    public static int VENT_WIDTH = 100;
+    public static int VENT_HEIGHT = 100;
 
     // random
     public static int LOST_FADE_IN_TIME = 150;

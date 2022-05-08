@@ -5,6 +5,7 @@ import Constants.*;
 import Throwable.Rock;
 import objects.EscapeArea;
 import objects.Goal;
+import objects.Vent;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -31,6 +32,9 @@ public class RubbishRaider extends PApplet {
     PImage COMPASS;
     PImage COMPASS_ARROW;
     PImage RACCOON_FACE;
+    PImage EXCLAMATION;
+    PImage VENT;
+    PImage VENT2;
 
     // hud
     PImage HUD;
@@ -67,7 +71,7 @@ public class RubbishRaider extends PApplet {
     EscapeArea escapeArea = new EscapeArea(GameConstants.MY_WIDTH / 5, GameConstants.MY_HEIGHT / 5);
     ArrayList<Rock> ammo;
     int ammoAmount;
-//    ArrayList<Bed> beds = new ArrayList<>();
+    ArrayList<Vent> vents = new ArrayList<>();
 
     public static void main(String[] args) {
         RubbishRaider main = new RubbishRaider();
@@ -242,20 +246,24 @@ public class RubbishRaider extends PApplet {
         camera.integrate(player);
         camera.render(currentLevel, KITCHEN_TILE, BATHROOM_TILE, BEDROOM_TILE, LIVING_ROOM_TILE, WALL_TILE, DEFAULT_TILE);
 
+        renderUpdateVents();
         renderUpdateGoal();
         renderUpdateEscapeArea();
         if (gm != GameState.LOST && gm != GameState.LEVEL_WON)
             renderUpdatePlayer();
         renderUpdateEnemies();
-        renderUpdateObjects();
         renderUpdateThrowables();
         updateSprint();
+
         camera.drawCrosshair(player, mouseX, mouseY);
         camera.drawHud(goal, GOAL, HUD, HUD_TICKED, ammoAmount, level, player.sprintDuration, COMPASS, COMPASS_ARROW, escapeArea);
         if (showingMap) camera.drawMap(currentLevel, player, RACCOON_FACE, escapeArea, ESCAPE_AREA, enemies);
     }
 
     private void renderUpdatePlayer() {
+
+        if (player.hiding) return;
+
         player.integrate();
         camera.drawPlayer(player, PLAYER_IMAGE1, PLAYER_IMAGE2);
     }
@@ -279,7 +287,7 @@ public class RubbishRaider extends PApplet {
     private void renderUpdateEnemy(Enemy enemy) {
         camera.drawEnemy(enemy, ENEMY_LEFT, ENEMY_RIGHT);
 
-        if (!enemy.integrate(camera, player, gm == GameState.LEVEL_WON)) return;
+        if (!enemy.integrate(camera, player, gm == GameState.LEVEL_WON, EXCLAMATION)) return;
 
         // means player has been caught
         gm = GameState.LOST;
@@ -295,14 +303,10 @@ public class RubbishRaider extends PApplet {
         }
     }
 
-    private void renderUpdateObjects() {
-        renderUpdateBeds();
-    }
-
-    private void renderUpdateBeds() {
-//        for (Bed bed : beds) {
-//            camera.drawBed(bed, BED);
-//        }
+    private void renderUpdateVents() {
+        for (Vent vent : vents) {
+            camera.drawVent(vent, VENT, VENT2);
+        }
     }
 
     private void renderUpdateThrowables() {
@@ -349,6 +353,8 @@ public class RubbishRaider extends PApplet {
         level++;
 
         currentLevel.generateLevel(enemies, player, goal);
+
+        vents = currentLevel.vents;
 
         gm = GameState.STARTING_LEVEL;
 
@@ -399,6 +405,7 @@ public class RubbishRaider extends PApplet {
         if (key == 'a') player.stopMovingLeft();
         if (key == 's') player.stopMovingDown();
         if (key == 'd') player.stopMovingRight();
+        if (key == 'e') player.interact(vents);
         if (key == ' ') player.stopSprinting();
         if (key == 'm') showingMap = false;
     }
@@ -434,6 +441,8 @@ public class RubbishRaider extends PApplet {
         ENEMY_RIGHT = loadImage("./assets/enemyRight.png");
         ENEMY_LEFT.resize(80, 80);
         ENEMY_RIGHT.resize(80, 80);
+        EXCLAMATION = loadImage("./assets/exclamation.png");
+        EXCLAMATION.resize(10, 40);
         BED = loadImage("./assets/bed.png");
         YOU_LOST = loadImage("./assets/youLost.png");
         YOU_LOST.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
@@ -445,6 +454,10 @@ public class RubbishRaider extends PApplet {
         ESCAPE_AREA.resize((int) GameConstants.ESCAPE_AREA_SIZE, (int) GameConstants.ESCAPE_AREA_SIZE);
         RACCOON_FACE = loadImage("./assets/raccoonFace.png");
         RACCOON_FACE.resize(GameConstants.RACCOON_FACE_WIDTH, GameConstants.RACCOON_FACE_HEIGHT);
+        VENT = loadImage("./assets/vent.png");
+        VENT.resize(GameConstants.VENT_WIDTH, GameConstants.VENT_HEIGHT);
+        VENT2 = loadImage("./assets/vent2.png");
+        VENT2.resize(GameConstants.VENT_WIDTH, GameConstants.VENT_HEIGHT);
 
 
         // tile
