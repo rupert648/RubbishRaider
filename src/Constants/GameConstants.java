@@ -28,9 +28,11 @@ public abstract class GameConstants {
     // maximum 5 seconds of sprint
     public static int MAX_SPRINT_DURATION = 300;
     public static int DIG_TIME = 90;
+    // speed
+    public static float PLAYER_SPEED = 3.0f;
 
     // camera
-    public static float CAMERA_SPEED = 10.0f;
+    public static float CAMERA_SPEED = 15.0f;
 
     // enemy constants
     public static int START_NUMB_ENEMIES = 7;

@@ -9,10 +9,13 @@ import objects.Vent;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
+import processing.data.JSONObject;
 
 import java.util.ArrayList;
 
 public class RubbishRaider extends PApplet {
+    public int highScore = 0;
+
     // the current level
     public Level currentLevel = new Level(this);
     public int level = 0;
@@ -39,6 +42,8 @@ public class RubbishRaider extends PApplet {
     // hud
     PImage HUD;
     PImage HUD_TICKED;
+    PImage PAUSE1;
+    PImage PAUSE2;
 
     // tiles
     PImage BATHROOM_TILE;
@@ -55,6 +60,7 @@ public class RubbishRaider extends PApplet {
 
     boolean menuFlash = false;
     boolean showingMap = false;
+    boolean pauseOption = true;
 
     // gamestate options
     GameState gm = GameState.MENU;
@@ -83,6 +89,7 @@ public class RubbishRaider extends PApplet {
     }
 
     public void setup() {
+        loadGameData();
         loadImages();
         cursor(CROSS);
     }
@@ -92,7 +99,7 @@ public class RubbishRaider extends PApplet {
     }
 
     public void initPlayer() {
-        player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, 3.0f, 1.0f);
+        player = new Player(GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2, 0, 0, 0, this, currentLevel, GameConstants.PLAYER_SPEED, 1.0f);
     }
 
     public void initGoal() {
@@ -154,9 +161,9 @@ public class RubbishRaider extends PApplet {
         tint(255, tintVal);
         imageMode(CORNER);
         image(TRANSPARENT, 0, 0);
-        stroke(255, 0, 0);
         textSize(50);
-        text("LEVEL  " + level + " COMPLETE", (float) GameConstants.MY_WIDTH / 2 - 100, (float) GameConstants.MY_HEIGHT / 2);
+        fill(255);
+        text("LEVEL  " + level + " COMPLETE", (float) GameConstants.MY_WIDTH / 2, (float) GameConstants.MY_HEIGHT / 2);
         fill(0);
         noStroke();
         noTint();
@@ -171,10 +178,30 @@ public class RubbishRaider extends PApplet {
         PImage image = menuFlash ? MENU1 : MENU2;
 
         image(image, 0, 0);
+
+        int x = GameConstants.MY_WIDTH / 2;
+        int y = 150 + GameConstants.MY_HEIGHT / 2;
+
+        // draw highScore;
+        fill(0);
+        textSize(50);
+        textAlign(CENTER);
+        // below gives text an outline
+        for(int x2 = -1; x2 < 4; x2++){
+            text("Highscore: " + highScore, (float) x + x2, y);
+            text("Highscore: " + highScore, (float) x, y + x2);
+        }
+        fill(255);
+        text("Highscore: " + highScore, (float) x, y);
+        fill(0);
     }
 
     private void paused() {
+        // display background
+        playGame();
 
+        imageMode(CENTER);
+        image(pauseOption ? PAUSE1 : PAUSE2, GameConstants.MY_WIDTH / 2, GameConstants.MY_HEIGHT / 2);
     }
 
     private void lost() {
@@ -265,7 +292,8 @@ public class RubbishRaider extends PApplet {
 
         if (player.hiding) return;
 
-        player.integrate(enemies);
+        if (gm != GameState.PAUSED)
+            player.integrate(enemies);
         camera.drawPlayer(player, PLAYER_IMAGE1, PLAYER_IMAGE2);
     }
 
@@ -288,10 +316,16 @@ public class RubbishRaider extends PApplet {
     private void renderUpdateEnemy(Enemy enemy) {
         camera.drawEnemy(enemy, ENEMY_LEFT, ENEMY_RIGHT);
 
+        if (gm == GameState.PAUSED) return;
         if (!enemy.integrate(camera, player, gm == GameState.LEVEL_WON, EXCLAMATION)) return;
 
         // means player has been caught
         gm = GameState.LOST;
+        // check if new highscore
+        if (level > highScore) {
+            writeNewHighScore(level);
+            highScore = level;
+        }
     }
 
     private void renderUpdateEscapeArea() {
@@ -318,7 +352,8 @@ public class RubbishRaider extends PApplet {
 
     private void renderThrowable(Rock rock) {
         if (rock.launched) {
-            rock.integrate(enemies);
+            if (gm != GameState.PAUSED)
+                rock.integrate(enemies);
             camera.drawRock(rock);
         }
     }
@@ -368,6 +403,11 @@ public class RubbishRaider extends PApplet {
     public void keyPressed() {
         if (gm == GameState.MENU) {
             handleMenuClick();
+            return;
+        }
+
+        if (gm == GameState.PAUSED) {
+            handlePauseClick();
             return;
         }
 
@@ -435,6 +475,27 @@ public class RubbishRaider extends PApplet {
         }
     }
 
+    public void handlePauseClick() {
+        if (key == CODED) {
+            if (keyCode == UP) {
+                pauseOption = !pauseOption;
+            } else if (keyCode == DOWN) {
+                pauseOption = !pauseOption;
+            }
+
+            return;
+        }
+
+        if (key == '\n') {
+            if (pauseOption) {
+                // continue playing game
+                gm = GameState.PLAYING;
+            } else {
+                gm = GameState.MENU;
+            }
+        }
+    }
+
     public void loadImages() {
         PLAYER_IMAGE1 = loadImage("./assets/raccoonTop1.png");
         PLAYER_IMAGE1.resize(88, 30);
@@ -483,6 +544,11 @@ public class RubbishRaider extends PApplet {
         MENU1.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
         MENU2.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
 
+        PAUSE1 = loadImage("./assets/PAUSEMENU1.png");
+        PAUSE2 = loadImage("./assets/PAUSEMENU2.png");
+        PAUSE1.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
+        PAUSE2.resize(GameConstants.MY_WIDTH, GameConstants.MY_HEIGHT);
+
         HUD = loadImage("./assets/hud1.png");
         HUD_TICKED = loadImage("./assets/hud2.png");
         HUD.resize(200, 200);
@@ -495,6 +561,29 @@ public class RubbishRaider extends PApplet {
 
         font = createFont("./assets/font.ttf", 128);
         textFont(font);
+    }
+
+    public void loadGameData() {
+        JSONObject json;
+        try {
+            // try and load in highscore
+            json = loadJSONObject("gameData.json");
+            highScore = json.getInt("highScore");
+        } catch (Exception e) {
+            System.out.println("error loading in data values");
+            // create new file
+            writeNewHighScore(1);
+            highScore = 1;
+        }
+
+        System.out.println(highScore);
+    }
+
+    public void writeNewHighScore(int newHighScore) {
+        JSONObject json = new JSONObject();
+        json.setInt("highScore", newHighScore);
+
+        saveJSONObject(json, "./src/data/gameData.json");
     }
 
 }
