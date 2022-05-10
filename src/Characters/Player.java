@@ -187,7 +187,8 @@ public class Player extends Character {
     public void drawStep(Camera camera) {
         if (!moving()) return;
 
-        float stepRadius = sneaking ? GameConstants.STEP_SOUND_RADIUS / 2 : GameConstants.STEP_SOUND_RADIUS;
+        float stepRadius = sprinting ? 1.3f * GameConstants.STEP_SOUND_RADIUS :
+                sneaking ? 0.5f * GameConstants.STEP_SOUND_RADIUS : GameConstants.STEP_SOUND_RADIUS;
 
         if (currentStepRadius < stepRadius) {
             applet.noFill();

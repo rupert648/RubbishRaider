@@ -39,7 +39,8 @@ public class Enemy extends AStarCharacter {
                 trackingPlayer = true;
                 lastHeardPosition = null;
             } else {
-                int stepRadius = player.sneaking ? GameConstants.STEP_SOUND_RADIUS / 2 : GameConstants.STEP_SOUND_RADIUS;
+                int stepRadius = (int) (player.sprinting ? 1.3f * GameConstants.STEP_SOUND_RADIUS :
+                        player.sneaking ? 0.5f * GameConstants.STEP_SOUND_RADIUS : GameConstants.STEP_SOUND_RADIUS);
 
                 checkIfCanHearPlayer(stepRadius, player, camera);
             }

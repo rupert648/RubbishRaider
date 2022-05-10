@@ -40,8 +40,6 @@ public class Rock {
 
             }
         };
-        // move between the start pos and the land pos
-        // TODO: make bounce off of walls
 
         if (position.dist(landPos) < 10) {
             landed = true;
@@ -56,7 +54,6 @@ public class Rock {
 
         position.add(dir);
 
-        // TODO: trash compass
     }
 
     public void makeSound(ArrayList<Enemy> enemies) {

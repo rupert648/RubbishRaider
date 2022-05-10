@@ -2,8 +2,8 @@ package Constants;
 
 public abstract class GameConstants {
     // game size
-    public static int MY_WIDTH = 1024;
-    public static int MY_HEIGHT = 768;
+    public static int MY_WIDTH = 1280;
+    public static int MY_HEIGHT = 720;
 
     public static int V_GRANULES = 90;
     public static int H_GRANULES = 100;
@@ -27,7 +27,7 @@ public abstract class GameConstants {
     public static int STEP_RADIUS_INCR = 5;
     // maximum 5 seconds of sprint
     public static int MAX_SPRINT_DURATION = 300;
-    public static int DIG_TIME = 90;
+    public static int DIG_TIME = 120;
     // speed
     public static float PLAYER_SPEED = 3.0f;
 
@@ -65,5 +65,5 @@ public abstract class GameConstants {
 
     // ammo
     public static int AMMO_PER_LEVEL = 10;
-    public static float ROCK_SPEED = 5;
+    public static float ROCK_SPEED = 10;
 }

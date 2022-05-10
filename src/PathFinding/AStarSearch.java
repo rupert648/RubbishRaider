@@ -83,10 +83,11 @@ public class AStarSearch {
         int newCostV = currentNode.getCost() + GameConstants.V_GRANULE_SIZE;
         int newCostH = currentNode.getCost() + GameConstants.H_GRANULE_SIZE;
         // look N
-        process(currentNode, graph[currRow - 1][currCol], currRow, currCol, goalPos, newCostH);
+        if (currRow - 1 >= 0 )
+            process(currentNode, graph[currRow - 1][currCol], currRow, currCol, goalPos, newCostH);
         // look NW
         // can only check this if the north and west squares both aren't blocked
-        if (graph[currRow - 1][currCol] != null && graph[currRow][currCol - 1] != null)
+        if (graph[currRow - 1][currCol - 1] != null && graph[currRow][currCol - 1] != null)
             process(currentNode, graph[currRow - 1][currCol - 1], currRow, currCol, goalPos, newCostH);
         // look NE
         // can only check this if the north and east squares both aren't blocked

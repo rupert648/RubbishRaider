@@ -203,7 +203,11 @@ public class Camera {
 
     public void drawVent(Vent vent, PImage VENT, PImage VENT2) {
         applet.imageMode(CORNER);
-        applet.image(vent.containsPlayer ? VENT2 : VENT, vent.position.x - position.x, vent.position.y - position.y);
+        applet.image(
+                vent.containsPlayer ? VENT2 : VENT,
+                vent.position.x - position.x,
+                vent.position.y - position.y
+        );
     }
 
     public void drawRock(Rock rock) {
