@@ -130,7 +130,6 @@ public class Enemy extends AStarCharacter {
         PVector temp = new PVector(player.position.x - camera.position.x, player.position.y - camera.position.y);
         PVector enemyTemp = new PVector(position.x - camera.position.x, position.y - camera.position.y);
 
-        // TODO: currently only track if can hear
         if (position.dist(player.position) < dist) {
             if (efficientDDA(enemyTemp, temp, camera)) {
                 // has line of sight of target

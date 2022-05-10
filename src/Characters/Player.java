@@ -183,7 +183,6 @@ public class Player extends Character {
                 || velocity.x < -0.5f || velocity.y < -0.5f;
     }
 
-    // TODO: make check all enemies
     public void drawStep(Camera camera) {
         if (!moving()) return;
 

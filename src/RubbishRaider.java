@@ -108,7 +108,6 @@ public class RubbishRaider extends PApplet {
 
     public void initEnemies() {
         enemies = new ArrayList<>();
-        // TODO: make adjust per level
 
         // new enemy every 2 levels
         int numbEnemies = GameConstants.START_NUMB_ENEMIES + level / 2;
@@ -455,8 +454,6 @@ public class RubbishRaider extends PApplet {
     }
 
     public void mousePressed() {
-        // TODO: draw arc from raccoon to mouse location
-
 
     }
 
